@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react'
+import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle, Video, X } from 'lucide-react'
 import { useContentStore, Review, Promotion } from '@/store/contentStore'
 import { useToastStore } from '@/store/toastStore'
 
@@ -101,70 +101,6 @@ export default function ContentPage() {
         </button>
       </div>
 
-      {/* Pages Tab */}
-      {activeTab === 'pages' && (
-        <div className="space-y-4">
-          {pages.map((page) => (
-            <motion.div
-              key={page.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{page.title}</h3>
-                  <p className="text-sm text-gray-400">{page.slug}</p>
-                </div>
-                <button
-                  onClick={handleSave}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] transition-all"
-                >
-                  <Save size={18} />
-                  Редактировать
-                </button>
-              </div>
-              <textarea
-                defaultValue={page.content}
-                className="w-full h-32 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-cyan transition-colors resize-none"
-              />
-            </motion.div>
-          ))}
-        </div>
-      )}
-
-      {/* Banners Tab */}
-      {activeTab === 'banners' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {banners.map((banner) => (
-            <motion.div
-              key={banner.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
-            >
-              <div className="aspect-video rounded-lg bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30 flex items-center justify-center mb-4">
-                <Image size={48} className="text-gray-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{banner.title}</h3>
-              <p className="text-sm text-gray-400 mb-4">Ссылка: {banner.link}</p>
-              <div className="flex items-center justify-between">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  banner.active
-                    ? 'bg-green-400/20 text-green-400 border border-green-400/30'
-                    : 'bg-gray-400/20 text-gray-400 border border-gray-400/30'
-                }`}>
-                  {banner.active ? 'Активен' : 'Неактивен'}
-                </span>
-                <button className="px-4 py-2 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all text-sm">
-                  Редактировать
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
-
       {/* Reviews Tab */}
       {activeTab === 'reviews' && (
         <div className="space-y-4">
@@ -200,16 +136,273 @@ export default function ContentPage() {
               <p className="text-gray-300 mb-4">{review.text}</p>
               <div className="flex gap-2">
                 {!review.approved && (
-                  <button className="px-4 py-2 bg-green-400/20 text-green-400 border border-green-400/30 rounded-lg hover:bg-green-400/30 transition-all text-sm">
+                  <button
+                    onClick={() => handleApproveReview(review.id)}
+                    className="px-4 py-2 bg-green-400/20 text-green-400 border border-green-400/30 rounded-lg hover:bg-green-400/30 transition-all text-sm"
+                  >
                     Одобрить
                   </button>
                 )}
-                <button className="px-4 py-2 bg-red-400/20 text-red-400 border border-red-400/30 rounded-lg hover:bg-red-400/30 transition-all text-sm">
+                <button
+                  onClick={() => handleDeleteReview(review.id)}
+                  className="px-4 py-2 bg-red-400/20 text-red-400 border border-red-400/30 rounded-lg hover:bg-red-400/30 transition-all text-sm"
+                >
                   Удалить
                 </button>
               </div>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {/* Promotions Tab */}
+      {activeTab === 'promotions' && (
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <button
+              onClick={handleAddPromotion}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all"
+            >
+              <Plus size={20} />
+              Добавить акцию
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {promotions.map((promotion) => (
+              <motion.div
+                key={promotion.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+              >
+                <div className="aspect-video rounded-lg bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30 flex items-center justify-center mb-4 overflow-hidden">
+                  {promotion.image && (promotion.image.startsWith('http') || promotion.image.startsWith('/') || promotion.image.startsWith('data:')) ? (
+                    <img src={promotion.image} alt={promotion.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-4xl">{promotion.image || '🏠'}</div>
+                  )}
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">{promotion.title}</h3>
+                <p className="text-sm text-gray-400 mb-2">{promotion.description}</p>
+                <p className="text-neon-cyan font-semibold mb-4">{promotion.discount}</p>
+                <div className="flex items-center justify-between">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    promotion.active
+                      ? 'bg-green-400/20 text-green-400 border border-green-400/30'
+                      : 'bg-gray-400/20 text-gray-400 border border-gray-400/30'
+                  }`}>
+                    {promotion.active ? 'Активна' : 'Неактивна'}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingPromotion(promotion)
+                        setIsPromotionModalOpen(true)
+                      }}
+                      className="px-4 py-2 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all text-sm"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Удалить акцию?')) {
+                          deletePromotion(promotion.id)
+                          addToast('Акция удалена', 'info')
+                        }
+                      }}
+                      className="px-4 py-2 bg-transparent border border-red-400 text-red-400 rounded-lg hover:bg-red-400 hover:text-white transition-all text-sm"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Promotion Modal */}
+      {isPromotionModalOpen && editingPromotion && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glassmorphism rounded-2xl p-8 max-w-2xl w-full border border-neon-cyan/30 relative max-h-[90vh] overflow-y-auto"
+          >
+            <button
+              onClick={() => {
+                setIsPromotionModalOpen(false)
+                setEditingPromotion(null)
+              }}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-neon-cyan transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            <h2 className="text-2xl font-bold text-gradient mb-6">
+              {editingPromotion.id === 0 ? 'Добавить акцию' : 'Редактировать акцию'}
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Название акции</label>
+                <input
+                  type="text"
+                  value={editingPromotion.title}
+                  onChange={(e) =>
+                    setEditingPromotion({ ...editingPromotion, title: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="Название акции"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Описание</label>
+                <textarea
+                  value={editingPromotion.description}
+                  onChange={(e) =>
+                    setEditingPromotion({ ...editingPromotion, description: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors resize-none"
+                  placeholder="Описание акции"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Скидка</label>
+                  <input
+                    type="text"
+                    value={editingPromotion.discount}
+                    onChange={(e) =>
+                      setEditingPromotion({ ...editingPromotion, discount: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                    placeholder="Скидка 20%"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Действует до</label>
+                  <input
+                    type="date"
+                    value={editingPromotion.validUntil}
+                    onChange={(e) =>
+                      setEditingPromotion({ ...editingPromotion, validUntil: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Image/Video Upload */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Изображение или видео</label>
+                <div className="space-y-3">
+                  {editingPromotion.image && (editingPromotion.image.startsWith('http') || editingPromotion.image.startsWith('/') || editingPromotion.image.startsWith('data:')) && (
+                    <div className="relative group">
+                      <div className="aspect-video rounded-lg bg-black/50 border border-neon-cyan/30 overflow-hidden">
+                        {editingPromotion.image.startsWith('data:video') ? (
+                          <video src={editingPromotion.image} controls className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={editingPromotion.image} alt={editingPromotion.title} className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditingPromotion({ ...editingPromotion, image: '' })}
+                        className="absolute top-2 right-2 p-1 bg-red-500/80 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-gray-300 hover:border-neon-cyan hover:text-neon-cyan transition-all cursor-pointer">
+                      <Image size={18} />
+                      <span>Загрузить изображение</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            const reader = new FileReader()
+                            reader.onload = (event) => {
+                              const result = event.target?.result as string
+                              setEditingPromotion({ ...editingPromotion, image: result })
+                            }
+                            reader.readAsDataURL(file)
+                          }
+                        }}
+                      />
+                    </label>
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-gray-300 hover:border-neon-cyan hover:text-neon-cyan transition-all cursor-pointer">
+                      <Video size={18} />
+                      <span>Загрузить видео</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            const reader = new FileReader()
+                            reader.onload = (event) => {
+                              const result = event.target?.result as string
+                              setEditingPromotion({ ...editingPromotion, image: result })
+                            }
+                            reader.readAsDataURL(file)
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Поддерживаются форматы: JPG, PNG, WebP, MP4, WebM. Максимальный размер: 10MB
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingPromotion.active}
+                    onChange={(e) =>
+                      setEditingPromotion({ ...editingPromotion, active: e.target.checked })
+                    }
+                    className="w-5 h-5 rounded border-neon-cyan/30 bg-black/50 text-neon-cyan focus:ring-neon-cyan"
+                  />
+                  <span className="text-sm text-gray-300">Активна</span>
+                </label>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handleSavePromotion}
+                  className="flex-1 px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center justify-center gap-2"
+                >
+                  <Save size={20} />
+                  Сохранить
+                </button>
+                <button
+                  onClick={() => {
+                    setIsPromotionModalOpen(false)
+                    setEditingPromotion(null)
+                  }}
+                  className="px-6 py-3 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all"
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>
