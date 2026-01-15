@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
+import { sendEmail, formatCallbackEmail } from '@/lib/email'
 
 interface CallbackModalProps {
   isOpen: boolean
@@ -94,18 +95,25 @@ export default function CallbackModal({ isOpen, onClose }: CallbackModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+            className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm"
           />
 
-          {/* Modal */}
+          {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto pointer-events-none"
           >
-            <div className="glassmorphism rounded-2xl p-6 sm:p-8 max-w-md w-full border border-neon-cyan/30 relative">
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md my-auto pointer-events-auto"
+            >
+            <div className="glassmorphism rounded-2xl p-6 sm:p-8 w-full border-2 border-neon-cyan/50 relative bg-black/40 backdrop-blur-xl max-h-[90vh] overflow-y-auto">
               {/* Close Button */}
               <button
                 onClick={onClose}
@@ -129,17 +137,17 @@ export default function CallbackModal({ isOpen, onClose }: CallbackModalProps) {
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">
+                  <label className="block text-sm text-gray-300 font-medium mb-2">
                     Имя <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    className={`w-full px-4 py-3 bg-black/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-colors ${
+                    className={`w-full px-4 py-3 bg-black/70 border-2 rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors ${
                       errors.name
-                        ? 'border-red-400 focus:border-red-400'
-                        : 'border-neon-cyan/30 focus:border-neon-cyan'
+                        ? 'border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/50'
+                        : 'border-neon-cyan/50 focus:border-neon-cyan focus:ring-2 focus:ring-neon-cyan/50'
                     }`}
                     placeholder="Ваше имя"
                   />
@@ -149,17 +157,17 @@ export default function CallbackModal({ isOpen, onClose }: CallbackModalProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">
+                  <label className="block text-sm text-gray-300 font-medium mb-2">
                     Телефон <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    className={`w-full px-4 py-3 bg-black/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-colors ${
+                    className={`w-full px-4 py-3 bg-black/70 border-2 rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors ${
                       errors.phone
-                        ? 'border-red-400 focus:border-red-400'
-                        : 'border-neon-cyan/30 focus:border-neon-cyan'
+                        ? 'border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/50'
+                        : 'border-neon-cyan/50 focus:border-neon-cyan focus:ring-2 focus:ring-neon-cyan/50'
                     }`}
                     placeholder="+7 (999) 123-45-67"
                   />
@@ -178,6 +186,7 @@ export default function CallbackModal({ isOpen, onClose }: CallbackModalProps) {
               </form>
             </div>
           </motion.div>
+        </motion.div>
         </>
       )}
     </AnimatePresence>

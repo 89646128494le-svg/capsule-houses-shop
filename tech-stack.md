@@ -1,1 +1,0 @@
-Next.js, Tailwind CSS, Framer Motion, Lucide Icons

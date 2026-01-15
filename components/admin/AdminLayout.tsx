@@ -20,8 +20,9 @@ const menuItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Товары', href: '/admin/products', icon: Package },
   { name: 'Заказы', href: '/admin/orders', icon: ShoppingBag },
-  { name: 'Аналитика', href: '/admin/analytics', icon: BarChart3 },
+  { name: 'Страницы', href: '/admin/pages', icon: FileText },
   { name: 'Контент', href: '/admin/content', icon: FileText },
+  { name: 'Аналитика', href: '/admin/analytics', icon: BarChart3 },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

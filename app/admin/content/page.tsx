@@ -2,31 +2,70 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Image, Video, Edit, Save } from 'lucide-react'
+import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react'
+import { useContentStore, Review, Promotion } from '@/store/contentStore'
 import { useToastStore } from '@/store/toastStore'
 
 export default function ContentPage() {
-  const [activeTab, setActiveTab] = useState<'pages' | 'banners' | 'reviews'>('pages')
+  const [activeTab, setActiveTab] = useState<'reviews' | 'promotions'>('reviews')
+  const reviews = useContentStore((state) => state.reviews)
+  const promotions = useContentStore((state) => state.promotions)
+  const updateReview = useContentStore((state) => state.updateReview)
+  const deleteReview = useContentStore((state) => state.deleteReview)
+  const addPromotion = useContentStore((state) => state.addPromotion)
+  const updatePromotion = useContentStore((state) => state.updatePromotion)
+  const deletePromotion = useContentStore((state) => state.deletePromotion)
   const addToast = useToastStore((state) => state.addToast)
 
-  const pages = [
-    { id: 1, title: 'О продукте', slug: '/about', content: 'Содержимое страницы...' },
-    { id: 2, title: 'Комплектация', slug: '/equipment', content: 'Содержимое страницы...' },
-    { id: 3, title: 'Оплата и доставка', slug: '/payment', content: 'Содержимое страницы...' },
-  ]
+  const [editingReview, setEditingReview] = useState<Review | null>(null)
+  const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
+  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false)
 
-  const banners = [
-    { id: 1, title: 'Главный баннер', image: '/banner-1.jpg', link: '/catalog', active: true },
-    { id: 2, title: 'Акция недели', image: '/banner-2.jpg', link: '/promotions', active: true },
-  ]
+  const handleApproveReview = (id: number) => {
+    updateReview(id, { approved: true })
+    addToast('Отзыв одобрен', 'success')
+  }
 
-  const reviews = [
-    { id: 1, author: 'Иван Иванов', text: 'Отличный дом, очень доволен покупкой!', rating: 5, approved: true },
-    { id: 2, author: 'Мария Петрова', text: 'Качество на высшем уровне', rating: 5, approved: false },
-  ]
+  const handleDeleteReview = (id: number) => {
+    if (confirm('Удалить отзыв?')) {
+      deleteReview(id)
+      addToast('Отзыв удален', 'info')
+    }
+  }
 
-  const handleSave = () => {
-    addToast('Изменения сохранены', 'success')
+  const handleAddPromotion = () => {
+    setEditingPromotion({
+      id: 0,
+      title: '',
+      description: '',
+      discount: '',
+      validUntil: '',
+      image: '🏠',
+      active: true,
+    })
+    setIsPromotionModalOpen(true)
+  }
+
+  const handleSavePromotion = () => {
+    if (!editingPromotion) return
+
+    if (editingPromotion.id === 0) {
+      addPromotion({
+        title: editingPromotion.title,
+        description: editingPromotion.description,
+        discount: editingPromotion.discount,
+        validUntil: editingPromotion.validUntil,
+        image: editingPromotion.image,
+        active: editingPromotion.active,
+      })
+      addToast('Акция добавлена', 'success')
+    } else {
+      updatePromotion(editingPromotion.id, editingPromotion)
+      addToast('Акция обновлена', 'success')
+    }
+    
+    setIsPromotionModalOpen(false)
+    setEditingPromotion(null)
   }
 
   return (
@@ -39,28 +78,6 @@ export default function ContentPage() {
       {/* Tabs */}
       <div className="flex gap-2 border-b border-neon-cyan/20">
         <button
-          onClick={() => setActiveTab('pages')}
-          className={`px-6 py-3 font-medium transition-colors ${
-            activeTab === 'pages'
-              ? 'text-neon-cyan border-b-2 border-neon-cyan'
-              : 'text-gray-400 hover:text-neon-cyan'
-          }`}
-        >
-          <FileText size={20} className="inline mr-2" />
-          Страницы
-        </button>
-        <button
-          onClick={() => setActiveTab('banners')}
-          className={`px-6 py-3 font-medium transition-colors ${
-            activeTab === 'banners'
-              ? 'text-neon-cyan border-b-2 border-neon-cyan'
-              : 'text-gray-400 hover:text-neon-cyan'
-          }`}
-        >
-          <Image size={20} className="inline mr-2" />
-          Баннеры
-        </button>
-        <button
           onClick={() => setActiveTab('reviews')}
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'reviews'
@@ -69,7 +86,18 @@ export default function ContentPage() {
           }`}
         >
           <Edit size={20} className="inline mr-2" />
-          Отзывы
+          Отзывы ({reviews.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('promotions')}
+          className={`px-6 py-3 font-medium transition-colors ${
+            activeTab === 'promotions'
+              ? 'text-neon-cyan border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-neon-cyan'
+          }`}
+        >
+          <Image size={20} className="inline mr-2" />
+          Акции ({promotions.length})
         </button>
       </div>
 

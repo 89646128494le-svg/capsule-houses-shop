@@ -83,13 +83,6 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-black/30 rounded-lg border border-neon-cyan/20">
-          <p className="text-xs text-gray-500 text-center">
-            Демо доступ: <br />
-            Email: admin@capsule.ru <br />
-            Пароль: admin123
-          </p>
-        </div>
       </motion.div>
     </div>
   )

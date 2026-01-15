@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
 import { useOrdersStore } from '@/store/ordersStore'
 import { useCartStore } from '@/store/cartStore'
+import { sendOrderEmailAdmin, sendOrderEmailCustomer } from '@/lib/email'
+import { sendSMS, formatOrderSMS, formatOrderSMSAdmin } from '@/lib/sms'
 
 interface QuickOrderModalProps {
   isOpen: boolean
@@ -28,9 +30,6 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    
     // Создаем заказ в админке
     const orderItems = cartItems.length > 0 
       ? cartItems.map(item => ({
@@ -44,13 +43,53 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
         : []
     
     if (orderItems.length > 0) {
-      addOrder({
+      const order = {
         customerName: formData.name,
         customerPhone: formData.phone,
         customerEmail: formData.email || undefined,
         items: orderItems,
         total: orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-        status: 'new',
+        status: 'new' as const,
+        deliveryAddress: undefined,
+        notes: undefined,
+      }
+      
+      const orderNumber = `ORD-${Date.now()}`
+      const fullOrder = {
+        orderNumber,
+        ...order,
+      }
+      
+      addOrder(fullOrder)
+      
+      // Отправка Email администратору
+      await sendOrderEmailAdmin(fullOrder)
+      
+      // Отправка Email клиенту (если указан email)
+      if (formData.email) {
+        await sendOrderEmailCustomer(fullOrder)
+      }
+      
+      // Отправка SMS администратору
+      // TODO: Замените на реальный номер администратора
+      const adminPhone = process.env.ADMIN_PHONE || '+79991234567'
+      await sendSMS({
+        to: adminPhone,
+        message: formatOrderSMSAdmin({
+          orderNumber,
+          customerName: formData.name,
+          total: order.total,
+        }),
+      })
+      
+      // Отправка SMS клиенту
+      await sendSMS({
+        to: formData.phone,
+        message: formatOrderSMS({
+          orderNumber,
+          customerName: formData.name,
+          total: order.total,
+        }),
       })
     }
     
@@ -79,8 +118,10 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
+            style={{ pointerEvents: 'auto' }}
           >
-            <div className="glassmorphism rounded-2xl p-8 max-w-md w-full border border-neon-cyan/30 relative">
+            <div className="glassmorphism rounded-2xl p-8 max-w-md w-full border border-neon-cyan/30 relative mx-auto">
               {/* Close Button */}
               <button
                 onClick={onClose}

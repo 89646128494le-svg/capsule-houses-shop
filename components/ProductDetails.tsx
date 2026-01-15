@@ -5,77 +5,8 @@ import { motion } from 'framer-motion'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useToastStore } from '@/store/toastStore'
+import { useProductsStore } from '@/store/productsStore'
 import QuickOrderModal from './modals/QuickOrderModal'
-
-// Mock product data - в реальном приложении это будет из API
-const mockProducts = {
-  1: {
-    id: 1,
-    name: 'Capsule Mini',
-    price: 890000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '3×2×2.5 м',
-    guests: 2,
-    description: 'Компактное решение для двоих',
-    materials: 'Каркас из алюминия, утепление эковатой',
-    weight: '850 кг',
-  },
-  2: {
-    id: 2,
-    name: 'Capsule Standard',
-    price: 1290000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '4×3×2.8 м',
-    guests: 4,
-    description: 'Идеальный вариант для семьи',
-    materials: 'Каркас из алюминия, утепление эковатой',
-    weight: '1200 кг',
-  },
-  3: {
-    id: 3,
-    name: 'Capsule Premium',
-    price: 1890000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '5×4×3 м',
-    guests: 6,
-    description: 'Просторное жильё с премиум-комплектацией',
-    materials: 'Каркас из алюминия, утепление эковатой',
-    weight: '1800 кг',
-  },
-  4: {
-    id: 4,
-    name: 'Capsule Luxe',
-    price: 2490000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '6×5×3.5 м',
-    guests: 8,
-    description: 'Максимальный комфорт и роскошь',
-    materials: 'Каркас из алюминия, утепление эковатой',
-    weight: '2500 кг',
-  },
-  5: {
-    id: 5,
-    name: 'Capsule Studio',
-    price: 1590000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '5×3×3 м',
-    guests: 4,
-    description: 'Студийное пространство для творчества',
-    materials: 'Каркас из алюминия, утепление эковатой',
-    weight: '1500 кг',
-  },
-  6: {
-    id: 6,
-    name: 'Capsule Office',
-    price: 1690000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '4×4×3 м',
-    guests: 2,
-    description: 'Рабочее пространство нового уровня',
-    materials: 'Каркас из алюминия, утепление эковатой',
-    weight: '1400 кг',
-  },
-}
 
 interface ProductDetailsProps {
   productId: number
@@ -86,8 +17,9 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
   const addToast = useToastStore((state) => state.addToast)
+  const getProductById = useProductsStore((state) => state.getProductById)
 
-  const product = mockProducts[productId as keyof typeof mockProducts]
+  const product = getProductById(productId)
 
   if (!product) {
     return (
@@ -181,13 +113,15 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                 <span className="text-gray-400">Количество гостей</span>
                 <span className="text-white font-medium">{product.guests}</span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-neon-cyan/20">
-                <span className="text-gray-400">Материалы</span>
-                <span className="text-white font-medium">{product.materials}</span>
+                  <div className="flex items-center justify-between py-2 border-b border-neon-cyan/20">
+                <span className="text-gray-400">Категория</span>
+                <span className="text-white font-medium">{product.category}</span>
               </div>
               <div className="flex items-center justify-between py-2">
-                <span className="text-gray-400">Вес</span>
-                <span className="text-white font-medium">{product.weight}</span>
+                <span className="text-gray-400">Наличие</span>
+                <span className={`font-medium ${product.inStock ? 'text-green-400' : 'text-red-400'}`}>
+                  {product.inStock ? 'В наличии' : 'Нет в наличии'}
+                </span>
               </div>
             </div>
           </div>

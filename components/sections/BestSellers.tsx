@@ -6,82 +6,20 @@ import { ShoppingCart, Eye, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
 import { useToastStore } from '@/store/toastStore'
+import { useProductsStore } from '@/store/productsStore'
 import QuickViewModal from '@/components/modals/QuickViewModal'
 import QuickOrderModal from '@/components/modals/QuickOrderModal'
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  images: string[]
-  dimensions: string
-  guests: number
-  description: string
-}
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'Capsule Mini',
-    price: 890000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '3×2×2.5 м',
-    guests: 2,
-    description: 'Компактное решение для двоих',
-  },
-  {
-    id: 2,
-    name: 'Capsule Standard',
-    price: 1290000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '4×3×2.8 м',
-    guests: 4,
-    description: 'Идеальный вариант для семьи',
-  },
-  {
-    id: 3,
-    name: 'Capsule Premium',
-    price: 1890000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '5×4×3 м',
-    guests: 6,
-    description: 'Просторное жильё с премиум-комплектацией',
-  },
-  {
-    id: 4,
-    name: 'Capsule Luxe',
-    price: 2490000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '6×5×3.5 м',
-    guests: 8,
-    description: 'Максимальный комфорт и роскошь',
-  },
-  {
-    id: 5,
-    name: 'Capsule Studio',
-    price: 1590000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '5×3×3 м',
-    guests: 4,
-    description: 'Студийное пространство для творчества',
-  },
-  {
-    id: 6,
-    name: 'Capsule Office',
-    price: 1690000,
-    images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
-    dimensions: '4×4×3 м',
-    guests: 2,
-    description: 'Рабочее пространство нового уровня',
-  },
-]
-
 export default function BestSellers() {
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
-  const [quickOrderProduct, setQuickOrderProduct] = useState<Product | null>(null)
+  const [quickViewProduct, setQuickViewProduct] = useState<ReturnType<typeof useProductsStore.getState>['products'][0] | null>(null)
+  const [quickOrderProduct, setQuickOrderProduct] = useState<ReturnType<typeof useProductsStore.getState>['products'][0] | null>(null)
+  const products = useProductsStore((state) => state.getProducts())
   const addItem = useCartStore((state) => state.addItem)
   const addToast = useToastStore((state) => state.addToast)
+  
+  // Берем первые 6 товаров как хиты продаж
+  const bestSellers = products.slice(0, 6)
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -91,7 +29,7 @@ export default function BestSellers() {
     }).format(price)
   }
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: typeof products[0]) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -102,11 +40,11 @@ export default function BestSellers() {
     addToast(`${product.name} добавлен в корзину`, 'success')
   }
 
-  const handleQuickView = (product: Product) => {
+  const handleQuickView = (product: typeof products[0]) => {
     setQuickViewProduct(product)
   }
 
-  const handleQuickAdd = (product: Product) => {
+  const handleQuickAdd = (product: typeof products[0]) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -138,7 +76,7 @@ export default function BestSellers() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {products.map((product, index) => {
+          {bestSellers.map((product, index) => {
             const [currentImageIndex, setCurrentImageIndex] = useState(0)
             const isHovered = hoveredProduct === product.id
 

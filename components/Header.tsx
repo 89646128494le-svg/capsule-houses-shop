@@ -4,18 +4,20 @@ import { useState } from 'react'
 import { Menu, X, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import CallbackModal from './modals/CallbackModal'
 
 const menuItems = [
   { name: 'Главная', href: '/' },
-  { name: 'Каталог', href: '/catalog' },
   { name: 'О продукте', href: '/about' },
+  { name: 'Каталог', href: '/catalog' },
+  { name: 'Комплектация', href: '/equipment' },
+  { name: 'Оплата и доставка', href: '/payment' },
+  { name: 'Акции', href: '/promotions' },
+  { name: 'Партнёрам', href: '/partners' },
   { name: 'Контакты', href: '/contacts' },
 ]
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isCallbackModalOpen, setIsCallbackModalOpen] = useState(false)
 
   return (
     <motion.header
@@ -27,18 +29,18 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 -ml-2 lg:-ml-4">
             <div className="text-2xl font-bold text-gradient">CAPSULE</div>
             <div className="hidden sm:block text-sm text-gray-400">HOUSES</div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {menuItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm text-gray-300 hover:text-neon-cyan transition-colors duration-300"
+                className="text-sm text-gray-300 hover:text-neon-cyan transition-colors duration-300 whitespace-nowrap"
               >
                 {item.name}
               </Link>
@@ -47,14 +49,23 @@ export default function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Phone Number - Desktop */}
+            <a
+              href="tel:+79991234567"
+              className="hidden lg:flex items-center space-x-2 text-gray-300 hover:text-neon-cyan transition-colors"
+            >
+              <Phone size={18} />
+              <span className="text-sm">+7 (999) 123-45-67</span>
+            </a>
+
             {/* Callback Button - Desktop */}
-            <button
-              onClick={() => setIsCallbackModalOpen(true)}
+            <Link
+              href="/callback"
               className="hidden md:flex items-center space-x-2 px-4 py-2 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all duration-300"
             >
               <Phone size={18} />
               <span className="text-sm">Заказать звонок</span>
-            </button>
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button
@@ -88,26 +99,18 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
-              <button
-                onClick={() => {
-                  setIsCallbackModalOpen(true)
-                  setIsMenuOpen(false)
-                }}
+              <Link
+                href="/callback"
+                onClick={() => setIsMenuOpen(false)}
                 className="w-full mt-3 px-4 py-2 text-sm bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <Phone size={18} />
                 Заказать звонок
-              </button>
+              </Link>
             </nav>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Callback Modal */}
-      <CallbackModal
-        isOpen={isCallbackModalOpen}
-        onClose={() => setIsCallbackModalOpen(false)}
-      />
     </motion.header>
   )
 }

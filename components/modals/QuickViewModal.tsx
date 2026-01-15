@@ -5,17 +5,8 @@ import { X, ShoppingCart, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { useToastStore } from '@/store/toastStore'
+import { Product } from '@/store/productsStore'
 import QuickOrderModal from './QuickOrderModal'
-
-interface Product {
-  id: number
-  name: string
-  price: number
-  images: string[]
-  dimensions: string
-  guests: number
-  description: string
-}
 
 interface QuickViewModalProps {
   isOpen: boolean
@@ -75,6 +66,8 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            style={{ pointerEvents: 'auto' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="glassmorphism rounded-2xl max-w-4xl w-full border border-neon-cyan/30 relative my-8">
