@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
-import { sendEmail } from '@/lib/email'
 
 export default function ContactsContent() {
   const [formData, setFormData] = useState({
@@ -20,16 +19,27 @@ export default function ContactsContent() {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Отправка на Email
-    const emailSent = await sendEmail({
-      to: 'info@capsulehouses.ru', // Замените на реальный email
-      subject: `Сообщение от ${formData.name}`,
-      body: `Имя: ${formData.name}\nEmail: ${formData.email}\nТелефон: ${formData.phone}\n\nСообщение:\n${formData.message}`,
-    })
-    
-    if (emailSent) {
-      addToast('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.', 'success')
-    } else {
+    // Отправка через API route (безопасно, API ключи на сервере)
+    try {
+      const response = await fetch('/api/send-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+        }),
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        addToast('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.', 'success')
+      } else {
+        addToast('Ошибка отправки. Попробуйте позже.', 'error')
+      }
+    } catch (error) {
       addToast('Ошибка отправки. Попробуйте позже.', 'error')
     }
     

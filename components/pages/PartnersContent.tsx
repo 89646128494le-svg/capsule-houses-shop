@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { Handshake, TrendingUp, Users, Award, Mail } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
-import { sendEmail } from '@/lib/email'
 
 export default function PartnersContent() {
   const [formData, setFormData] = useState({
@@ -38,16 +37,27 @@ export default function PartnersContent() {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Отправка на Email
-    const emailSent = await sendEmail({
-      to: 'partners@capsulehouses.ru', // Замените на реальный email
-      subject: 'Новая заявка на партнёрство',
-      body: `Компания: ${formData.company}\nИмя: ${formData.name}\nТелефон: ${formData.phone}\nEmail: ${formData.email}`,
-    })
-    
-    if (emailSent) {
-      addToast('Заявка отправлена! Мы свяжемся с вами в ближайшее время.', 'success')
-    } else {
+    // Отправка через API route (безопасно, API ключи на сервере)
+    try {
+      const response = await fetch('/api/send-partner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: formData.company,
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+        }),
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        addToast('Заявка отправлена! Мы свяжемся с вами в ближайшее время.', 'success')
+      } else {
+        addToast('Ошибка отправки. Попробуйте позже.', 'error')
+      }
+    } catch (error) {
       addToast('Ошибка отправки. Попробуйте позже.', 'error')
     }
     

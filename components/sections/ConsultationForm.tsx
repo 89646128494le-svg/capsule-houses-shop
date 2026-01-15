@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Mail, CheckCircle } from 'lucide-react'
 import { useToastStore } from '@/store/toastStore'
-import { sendEmail } from '@/lib/email'
 
 export default function ConsultationForm() {
   const [formData, setFormData] = useState({
@@ -60,16 +59,25 @@ export default function ConsultationForm() {
 
     setIsSubmitting(true)
     
-    // Отправка на Email
-    const emailSent = await sendEmail({
-      to: 'info@capsulehouses.ru', // Замените на реальный email
-      subject: 'Новая заявка на консультацию',
-      body: `Имя: ${formData.name}\nТелефон: ${formData.phone}`,
-    })
-    
-    if (emailSent) {
-      addToast('Заявка отправлена! Мы свяжемся с вами в ближайшее время.', 'success')
-    } else {
+    // Отправка через API route (безопасно, API ключи на сервере)
+    try {
+      const response = await fetch('/api/send-consultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+        }),
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        addToast('Заявка отправлена! Мы свяжемся с вами в ближайшее время.', 'success')
+      } else {
+        addToast('Ошибка отправки. Попробуйте позже.', 'error')
+      }
+    } catch (error) {
       addToast('Ошибка отправки. Попробуйте позже.', 'error')
     }
     

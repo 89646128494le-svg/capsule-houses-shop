@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
-import { sendEmail, formatCallbackEmail } from '@/lib/email'
 
 interface CallbackModalProps {
   isOpen: boolean
@@ -61,16 +60,27 @@ export default function CallbackModal({ isOpen, onClose }: CallbackModalProps) {
 
     setIsSubmitting(true)
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    
-    // TODO: Отправка на Email через API
-    console.log('Callback request:', formData)
-    
-    // В реальном приложении здесь будет отправка на Email
-    // Например: await sendEmail({ to: 'info@capsule.ru', subject: 'Заявка на звонок', body: formData })
-    
-    addToast('Заявка принята! Мы свяжемся с вами в ближайшее время.', 'success')
+    // Отправка через API route (безопасно, API ключи на сервере)
+    try {
+      const response = await fetch('/api/send-callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+        }),
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        addToast('Заявка принята! Мы свяжемся с вами в ближайшее время.', 'success')
+      } else {
+        addToast('Заявка принята, но произошла ошибка при отправке. Мы свяжемся с вами.', 'warning')
+      }
+    } catch (error) {
+      addToast('Заявка принята, но произошла ошибка при отправке. Мы свяжемся с вами.', 'warning')
+    }
     setFormData({ name: '', phone: '' })
     setErrors({ name: '', phone: '' })
     setIsSubmitting(false)
