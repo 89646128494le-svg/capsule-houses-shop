@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle, Video, X } from 'lucide-react'
+import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle, Video, X, Phone, Mail, MapPin, Globe } from 'lucide-react'
 import { useContentStore, Review, Promotion } from '@/store/contentStore'
 import { useToastStore } from '@/store/toastStore'
 
 export default function ContentPage() {
-  const [activeTab, setActiveTab] = useState<'reviews' | 'promotions'>('reviews')
+  const [activeTab, setActiveTab] = useState<'reviews' | 'promotions' | 'contacts'>('reviews')
   const reviews = useContentStore((state) => state.reviews)
   const promotions = useContentStore((state) => state.promotions)
   const updateReview = useContentStore((state) => state.updateReview)
@@ -15,7 +15,29 @@ export default function ContentPage() {
   const addPromotion = useContentStore((state) => state.addPromotion)
   const updatePromotion = useContentStore((state) => state.updatePromotion)
   const deletePromotion = useContentStore((state) => state.deletePromotion)
+  const footerContent = useContentStore((state) => state.footerContent)
+  const updateFooterContent = useContentStore((state) => state.updateFooterContent)
+  const updateContactInfo = useContentStore((state) => state.updateContactInfo)
+  const updateSocialLink = useContentStore((state) => state.updateSocialLink)
+  const updateLegalInfo = useContentStore((state) => state.updateLegalInfo)
   const addToast = useToastStore((state) => state.addToast)
+  
+  const [contactForm, setContactForm] = useState({
+    phone: footerContent.contacts.phone,
+    email: footerContent.contacts.email,
+    address: footerContent.contacts.address,
+  })
+  
+  const [footerForm, setFooterForm] = useState({
+    logoText: footerContent.logoText,
+    description: footerContent.description,
+  })
+  
+  const [legalForm, setLegalForm] = useState({
+    privacyPolicyText: footerContent.legalInfo.privacyPolicyText,
+    ogrn: footerContent.legalInfo.ogrn,
+    companyName: footerContent.legalInfo.companyName,
+  })
 
   const [editingReview, setEditingReview] = useState<Review | null>(null)
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null)
@@ -401,6 +423,215 @@ export default function ContentPage() {
                   Отмена
                 </button>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Contacts Tab */}
+      {activeTab === 'contacts' && (
+        <div className="space-y-6">
+          {/* Footer Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Информация о компании</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Текст логотипа</label>
+                <input
+                  type="text"
+                  value={footerForm.logoText}
+                  onChange={(e) => setFooterForm({ ...footerForm, logoText: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="CAPSULE"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Описание компании</label>
+                <textarea
+                  value={footerForm.description}
+                  onChange={(e) => setFooterForm({ ...footerForm, description: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors resize-none"
+                  placeholder="Описание компании"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  updateFooterContent(footerForm)
+                  addToast('Информация о компании обновлена', 'success')
+                }}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Contacts */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <Phone size={24} />
+              Контактная информация
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
+                  <Phone size={16} />
+                  Телефон
+                </label>
+                <input
+                  type="tel"
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="+7 (999) 123-45-67"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
+                  <Mail size={16} />
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="info@capsulehouses.ru"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
+                  <MapPin size={16} />
+                  Адрес
+                </label>
+                <input
+                  type="text"
+                  value={contactForm.address}
+                  onChange={(e) => setContactForm({ ...contactForm, address: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="г. Москва, ул. Примерная, д. 1"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  updateContactInfo(contactForm)
+                  addToast('Контактная информация обновлена', 'success')
+                }}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Social Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <Globe size={24} />
+              Социальные сети
+            </h2>
+            <div className="space-y-4">
+              {footerContent.socialLinks.map((social) => (
+                <div key={social.id} className="p-4 bg-black/30 rounded-lg border border-neon-cyan/20">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Название</label>
+                      <input
+                        type="text"
+                        value={social.name}
+                        onChange={(e) => updateSocialLink(social.id, { name: e.target.value })}
+                        className="w-full px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Ссылка</label>
+                      <input
+                        type="url"
+                        value={social.href}
+                        onChange={(e) => updateSocialLink(social.id, { href: e.target.value })}
+                        className="w-full px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors text-sm"
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Иконка (эмодзи или текст)</label>
+                      <input
+                        type="text"
+                        value={social.icon}
+                        onChange={(e) => updateSocialLink(social.id, { icon: e.target.value })}
+                        className="w-full px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors text-sm"
+                        placeholder="💬 или VK"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Legal Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Юридическая информация</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Текст ссылки на политику конфиденциальности</label>
+                <input
+                  type="text"
+                  value={legalForm.privacyPolicyText}
+                  onChange={(e) => setLegalForm({ ...legalForm, privacyPolicyText: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="Политика конфиденциальности"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">ОГРН</label>
+                <input
+                  type="text"
+                  value={legalForm.ogrn}
+                  onChange={(e) => setLegalForm({ ...legalForm, ogrn: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="1234567890123"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Название компании / ИП</label>
+                <input
+                  type="text"
+                  value={legalForm.companyName}
+                  onChange={(e) => setLegalForm({ ...legalForm, companyName: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="ИП Иванов Иван Иванович"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  updateLegalInfo(legalForm)
+                  addToast('Юридическая информация обновлена', 'success')
+                }}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить
+              </button>
             </div>
           </motion.div>
         </div>

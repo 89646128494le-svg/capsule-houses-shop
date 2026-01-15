@@ -9,13 +9,14 @@ export default function AnalyticsPage() {
   const totalRevenue = useOrdersStore((state) => state.getTotalRevenue())
   const ordersCount = useOrdersStore((state) => state.getOrdersCount())
   
-  // Mock данные для демонстрации
+  // Реальная статистика на основе заказов
+  const averageOrder = ordersCount > 0 ? Math.round(totalRevenue / ordersCount) : 0
   const stats = [
     {
       name: 'Общая выручка',
-      value: `${(totalRevenue / 1000000).toFixed(1)}М ₽`,
-      change: '+12.5%',
-      changeType: 'up' as const,
+      value: totalRevenue > 0 ? `${(totalRevenue / 1000000).toFixed(1)}М ₽` : '0 ₽',
+      change: null,
+      changeType: null as null,
       icon: DollarSign,
       color: 'text-green-400',
       bgColor: 'bg-green-400/10',
@@ -23,26 +24,26 @@ export default function AnalyticsPage() {
     {
       name: 'Всего заказов',
       value: ordersCount.toString(),
-      change: '+8.2%',
-      changeType: 'up' as const,
+      change: null,
+      changeType: null as null,
       icon: ShoppingBag,
       color: 'text-blue-400',
       bgColor: 'bg-blue-400/10',
     },
     {
       name: 'Средний чек',
-      value: `${Math.round(totalRevenue / ordersCount).toLocaleString('ru-RU')} ₽`,
-      change: '+5.1%',
-      changeType: 'up' as const,
+      value: averageOrder > 0 ? `${averageOrder.toLocaleString('ru-RU')} ₽` : '0 ₽',
+      change: null,
+      changeType: null as null,
       icon: TrendingUp,
       color: 'text-purple-400',
       bgColor: 'bg-purple-400/10',
     },
     {
-      name: 'Активных клиентов',
-      value: '124',
-      change: '+15.3%',
-      changeType: 'up' as const,
+      name: 'Уникальных клиентов',
+      value: new Set(orders.map(o => o.customerPhone)).size.toString(),
+      change: null,
+      changeType: null as null,
       icon: Users,
       color: 'text-yellow-400',
       bgColor: 'bg-yellow-400/10',
@@ -57,13 +58,21 @@ export default function AnalyticsPage() {
     { status: 'delivered', label: 'Доставлены', count: orders.filter((o) => o.status === 'delivered').length, color: 'bg-green-400' },
   ]
 
-  // Топ товаров (mock)
-  const topProducts = [
-    { name: 'Capsule Standard', sales: 45, revenue: 58050000 },
-    { name: 'Capsule Premium', sales: 32, revenue: 60480000 },
-    { name: 'Capsule Mini', sales: 28, revenue: 24920000 },
-    { name: 'Capsule Luxe', sales: 15, revenue: 37350000 },
-  ]
+  // Топ товаров (реальные данные из заказов)
+  const productStats = new Map<string, { sales: number; revenue: number }>()
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      const existing = productStats.get(item.name) || { sales: 0, revenue: 0 }
+      productStats.set(item.name, {
+        sales: existing.sales + item.quantity,
+        revenue: existing.revenue + (item.price * item.quantity),
+      })
+    })
+  })
+  const topProducts = Array.from(productStats.entries())
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10)
 
   return (
     <div className="space-y-6">
@@ -88,10 +97,12 @@ export default function AnalyticsPage() {
                 <div className={`w-12 h-12 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
                   <Icon size={24} className={stat.color} />
                 </div>
-                <div className={`flex items-center gap-1 text-sm ${stat.changeType === 'up' ? 'text-green-400' : 'text-red-400'}`}>
-                  {stat.changeType === 'up' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
-                  {stat.change}
-                </div>
+                {stat.change && (
+                  <div className={`flex items-center gap-1 text-sm ${stat.changeType === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                    {stat.changeType === 'up' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+                    {stat.change}
+                  </div>
+                )}
               </div>
               <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
               <div className="text-sm text-gray-400">{stat.name}</div>
@@ -128,8 +139,9 @@ export default function AnalyticsPage() {
         {/* Top Products */}
         <div className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20">
           <h2 className="text-2xl font-bold text-white mb-6">Топ товаров</h2>
-          <div className="space-y-4">
-            {topProducts.map((product, index) => (
+          {topProducts.length > 0 ? (
+            <div className="space-y-4">
+              {topProducts.map((product, index) => (
               <div key={product.name} className="flex items-center justify-between p-4 bg-black/20 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-neon-cyan/20 flex items-center justify-center text-neon-cyan font-bold">
@@ -147,7 +159,13 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <ShoppingBag size={48} className="mx-auto mb-4 opacity-50" />
+              <p>Пока нет данных о продажах</p>
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react'
+import { Phone, Mail, MapPin } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useContentStore } from '@/store/contentStore'
 
 const menuItems = [
   { name: 'Главная', href: '/' },
@@ -15,14 +16,8 @@ const menuItems = [
   { name: 'Контакты', href: '/contacts' },
 ]
 
-const socialLinks = [
-  { name: 'WhatsApp', href: '#', icon: '💬' },
-  { name: 'Telegram', href: '#', icon: '✈️' },
-  { name: 'VK', href: '#', icon: 'VK' },
-  { name: 'Instagram', href: '#', icon: 'IG' },
-]
-
 export default function Footer() {
+  const footerContent = useContentStore((state) => state.footerContent)
   return (
     <footer className="relative mt-20 border-t border-neon-cyan/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -36,12 +31,11 @@ export default function Footer() {
             className="space-y-4"
           >
             <div className="flex items-center space-x-2">
-              <div className="text-2xl font-bold text-gradient">CAPSULE</div>
+              <div className="text-2xl font-bold text-gradient">{footerContent.logoText}</div>
               <div className="text-sm text-gray-400">HOUSES</div>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Инновационные капсульные дома с технологичным дизайном. 
-              Быстрая сборка, высокое качество, уникальные решения для современной жизни.
+              {footerContent.description}
             </p>
           </motion.div>
 
@@ -78,22 +72,22 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-neon-cyan">Контакты</h3>
             <div className="space-y-3">
               <a
-                href="tel:+79991234567"
+                href={`tel:${footerContent.contacts.phone.replace(/\s/g, '')}`}
                 className="flex items-center space-x-3 text-sm text-gray-400 hover:text-neon-cyan transition-colors"
               >
                 <Phone size={18} />
-                <span>+7 (999) 123-45-67</span>
+                <span>{footerContent.contacts.phone}</span>
               </a>
               <a
-                href="mailto:info@capsulehouses.ru"
+                href={`mailto:${footerContent.contacts.email}`}
                 className="flex items-center space-x-3 text-sm text-gray-400 hover:text-neon-cyan transition-colors"
               >
                 <Mail size={18} />
-                <span>info@capsulehouses.ru</span>
+                <span>{footerContent.contacts.email}</span>
               </a>
               <div className="flex items-start space-x-3 text-sm text-gray-400">
                 <MapPin size={18} className="mt-0.5" />
-                <span>г. Москва, ул. Примерная, д. 1</span>
+                <span>{footerContent.contacts.address}</span>
               </div>
             </div>
           </motion.div>
@@ -108,10 +102,12 @@ export default function Footer() {
           >
             <h3 className="text-lg font-semibold text-neon-cyan">Социальные сети</h3>
             <div className="flex flex-wrap gap-3">
-              {socialLinks.map((social) => (
+              {footerContent.socialLinks.map((social) => (
                 <a
-                  key={social.name}
+                  key={social.id}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-3 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-sm text-gray-400 hover:text-neon-cyan hover:border-neon-cyan transition-all"
                   aria-label={social.name}
                 >
@@ -121,10 +117,10 @@ export default function Footer() {
             </div>
             <div className="pt-4 space-y-2 text-xs text-gray-500">
               <Link href="/privacy" className="hover:text-neon-cyan transition-colors block">
-                Политика конфиденциальности
+                {footerContent.legalInfo.privacyPolicyText}
               </Link>
-              <p>ОГРН: 1234567890123</p>
-              <p>ИП Иванов Иван Иванович</p>
+              <p>ОГРН: {footerContent.legalInfo.ogrn}</p>
+              <p>{footerContent.legalInfo.companyName}</p>
             </div>
           </motion.div>
         </div>

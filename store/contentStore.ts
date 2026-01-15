@@ -27,10 +27,38 @@ export interface Promotion {
   active: boolean
 }
 
+export interface ContactInfo {
+  phone: string
+  email: string
+  address: string
+}
+
+export interface SocialLink {
+  id: string
+  name: string
+  href: string
+  icon: string
+}
+
+export interface LegalInfo {
+  privacyPolicyText: string
+  ogrn: string
+  companyName: string
+}
+
+export interface FooterContent {
+  logoText: string
+  description: string
+  contacts: ContactInfo
+  socialLinks: SocialLink[]
+  legalInfo: LegalInfo
+}
+
 interface ContentStore {
   pages: PageContent[]
   reviews: Review[]
   promotions: Promotion[]
+  footerContent: FooterContent
   updatePage: (slug: string, content: Partial<PageContent>) => void
   addReview: (review: Omit<Review, 'id' | 'date' | 'approved'>) => void
   updateReview: (id: number, review: Partial<Review>) => void
@@ -38,6 +66,10 @@ interface ContentStore {
   addPromotion: (promotion: Omit<Promotion, 'id'>) => void
   updatePromotion: (id: number, promotion: Partial<Promotion>) => void
   deletePromotion: (id: number) => void
+  updateFooterContent: (content: Partial<FooterContent>) => void
+  updateContactInfo: (contacts: Partial<ContactInfo>) => void
+  updateSocialLink: (id: string, link: Partial<SocialLink>) => void
+  updateLegalInfo: (legal: Partial<LegalInfo>) => void
 }
 
 const initialPages: PageContent[] = [
@@ -112,10 +144,32 @@ const initialPromotions: Promotion[] = [
   },
 ]
 
+const initialFooterContent: FooterContent = {
+  logoText: 'CAPSULE',
+  description: 'Инновационные капсульные дома с технологичным дизайном. Быстрая сборка, высокое качество, уникальные решения для современной жизни.',
+  contacts: {
+    phone: '+7 (999) 123-45-67',
+    email: 'info@capsulehouses.ru',
+    address: 'г. Москва, ул. Примерная, д. 1',
+  },
+  socialLinks: [
+    { id: 'whatsapp', name: 'WhatsApp', href: '#', icon: '💬' },
+    { id: 'telegram', name: 'Telegram', href: '#', icon: '✈️' },
+    { id: 'vk', name: 'VK', href: '#', icon: 'VK' },
+    { id: 'instagram', name: 'Instagram', href: '#', icon: 'IG' },
+  ],
+  legalInfo: {
+    privacyPolicyText: 'Политика конфиденциальности',
+    ogrn: '1234567890123',
+    companyName: 'ИП Иванов Иван Иванович',
+  },
+}
+
 export const useContentStore = create<ContentStore>((set) => ({
   pages: initialPages,
   reviews: initialReviews,
   promotions: initialPromotions,
+  footerContent: initialFooterContent,
   
   updatePage: (slug, content) => {
     set((state) => ({
@@ -172,6 +226,41 @@ export const useContentStore = create<ContentStore>((set) => ({
   deletePromotion: (id) => {
     set((state) => ({
       promotions: state.promotions.filter((p) => p.id !== id),
+    }))
+  },
+  
+  updateFooterContent: (content) => {
+    set((state) => ({
+      footerContent: { ...state.footerContent, ...content },
+    }))
+  },
+  
+  updateContactInfo: (contacts) => {
+    set((state) => ({
+      footerContent: {
+        ...state.footerContent,
+        contacts: { ...state.footerContent.contacts, ...contacts },
+      },
+    }))
+  },
+  
+  updateSocialLink: (id, link) => {
+    set((state) => ({
+      footerContent: {
+        ...state.footerContent,
+        socialLinks: state.footerContent.socialLinks.map((l) =>
+          l.id === id ? { ...l, ...link } : l
+        ),
+      },
+    }))
+  },
+  
+  updateLegalInfo: (legal) => {
+    set((state) => ({
+      footerContent: {
+        ...state.footerContent,
+        legalInfo: { ...state.footerContent.legalInfo, ...legal },
+      },
     }))
   },
 }))
