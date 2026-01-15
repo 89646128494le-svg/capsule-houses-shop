@@ -6,8 +6,6 @@ import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
 import { useOrdersStore } from '@/store/ordersStore'
 import { useCartStore } from '@/store/cartStore'
-import { sendOrderEmailAdmin, sendOrderEmailCustomer } from '@/lib/email'
-import { sendSMS, formatOrderSMS, formatOrderSMSAdmin } from '@/lib/sms'
 
 interface QuickOrderModalProps {
   isOpen: boolean
@@ -62,33 +60,14 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
       
       addOrder(fullOrder)
       
-      // Отправка Email администратору
-      await sendOrderEmailAdmin(fullOrder)
-      
-      // Отправка Email клиенту (если указан email)
-      if (formData.email) {
-        await sendOrderEmailCustomer(fullOrder)
-      }
-      
-      // Отправка SMS администратору
-      // TODO: Замените на реальный номер администратора
-      const adminPhone = process.env.ADMIN_PHONE || '+79991234567'
-      await sendSMS({
-        to: adminPhone,
-        message: formatOrderSMSAdmin({
-          orderNumber,
-          customerName: formData.name,
-          total: order.total,
-        }),
-      })
-      
-      // Отправка SMS клиенту
-      await sendSMS({
-        to: formData.phone,
-        message: formatOrderSMS({
-          orderNumber,
-          customerName: formData.name,
-          total: order.total,
+      // Отправка через API route (безопасно, API ключи на сервере)
+      await fetch('/api/send-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order: fullOrder,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
         }),
       })
     }

@@ -6,8 +6,6 @@ import { Phone, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useToastStore } from '@/store/toastStore'
-import { sendCallbackEmail } from '@/lib/email'
-import { sendSMS, formatCallbackSMS } from '@/lib/sms'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -62,24 +60,19 @@ export default function CallbackPage() {
 
     setIsSubmitting(true)
     
-    // Отправка Email администратору
-    const emailSent = await sendCallbackEmail({
-      name: formData.name,
-      phone: formData.phone,
-    })
-    
-    // Отправка SMS администратору
-    // TODO: Замените на реальный номер администратора
-    const adminPhone = process.env.ADMIN_PHONE || '+79991234567'
-    await sendSMS({
-      to: adminPhone,
-      message: formatCallbackSMS({
+    // Отправка через API route (безопасно, API ключи на сервере)
+    const response = await fetch('/api/send-callback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         name: formData.name,
         phone: formData.phone,
       }),
     })
     
-    if (emailSent) {
+    const result = await response.json()
+    
+    if (result.success) {
       addToast('Заявка принята! Мы свяжемся с вами в ближайшее время.', 'success')
       setFormData({ name: '', phone: '' })
       setErrors({ name: '', phone: '' })
