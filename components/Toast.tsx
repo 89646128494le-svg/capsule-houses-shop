@@ -1,10 +1,10 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle, XCircle, X } from 'lucide-react'
+import { CheckCircle, XCircle, X, AlertTriangle } from 'lucide-react'
 import { useEffect } from 'react'
 
-export type ToastType = 'success' | 'error' | 'info'
+export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
 export interface Toast {
   id: string
@@ -30,6 +30,7 @@ function ToastItem({ toast, onClose }: ToastProps) {
     success: <CheckCircle size={20} className="text-green-400" />,
     error: <XCircle size={20} className="text-red-400" />,
     info: <CheckCircle size={20} className="text-neon-cyan" />,
+    warning: <AlertTriangle size={20} className="text-yellow-400" />,
   }
 
   return (
