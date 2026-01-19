@@ -84,7 +84,7 @@ export default function PartnersContent() {
         {/* Benefits */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {benefits.map((benefit, index) => {
-            const Icon = iconMap[benefit.icon] || TrendingUp
+            const Icon = (benefit.icon && iconMap[benefit.icon]) || TrendingUp
             return (
               <motion.div
                 key={benefit.id}
