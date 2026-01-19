@@ -147,6 +147,22 @@ export interface PageCustomData {
     heroTitle: string
     heroSubtitle: string
   }
+  contacts?: {
+    heroTitle: string
+    heroSubtitle: string
+  }
+  catalog?: {
+    heroTitle: string
+    heroSubtitle: string
+  }
+  cart?: {
+    heroTitle: string
+    heroSubtitle: string
+  }
+  callback?: {
+    heroTitle: string
+    heroSubtitle: string
+  }
 }
 
 interface ContentStore {
