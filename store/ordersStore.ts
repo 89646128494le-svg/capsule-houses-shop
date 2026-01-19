@@ -18,12 +18,13 @@ export interface Order {
   createdAt: string
   deliveryAddress?: string
   notes?: string
+  cancellationReason?: string
 }
 
 interface OrdersStore {
   orders: Order[]
   addOrder: (order: Omit<Order, 'id' | 'createdAt'> & { orderNumber?: string }) => void
-  updateOrderStatus: (id: number, status: Order['status']) => void
+  updateOrderStatus: (id: number, status: Order['status'], cancellationReason?: string) => void
   deleteOrder: (id: number) => void
   getOrdersByStatus: (status: Order['status']) => Order[]
   getTotalRevenue: () => number
@@ -50,10 +51,16 @@ export const useOrdersStore = create<OrdersStore>()(
         }))
       },
       
-      updateOrderStatus: (id, status) => {
+      updateOrderStatus: (id, status, cancellationReason) => {
         set((state) => ({
           orders: state.orders.map((order) =>
-            order.id === id ? { ...order, status } : order
+            order.id === id 
+              ? { 
+                  ...order, 
+                  status,
+                  cancellationReason: status === 'cancelled' ? cancellationReason : undefined
+                } 
+              : order
           ),
         }))
       },

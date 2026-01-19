@@ -126,6 +126,8 @@ export default function CatalogGrid() {
             {/* Mobile Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
+              aria-label={showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}
+              aria-expanded={showFilters}
               className="lg:hidden flex items-center gap-2 px-4 py-2 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all"
             >
               <Filter size={20} />
@@ -166,6 +168,7 @@ export default function CatalogGrid() {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
+                    aria-label="Сбросить все фильтры"
                     className="text-sm text-neon-cyan hover:text-neon-cyan-light transition-colors"
                   >
                     Сбросить
@@ -341,6 +344,7 @@ export default function CatalogGrid() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
+                      aria-label="Предыдущая страница"
                       className="px-4 py-2 bg-transparent border border-neon-cyan/30 text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Назад
@@ -361,6 +365,7 @@ export default function CatalogGrid() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
+                      aria-label="Следующая страница"
                       className="px-4 py-2 bg-transparent border border-neon-cyan/30 text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Вперёд

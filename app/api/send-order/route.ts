@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { sendOrderEmailAdmin, sendOrderEmailCustomer } from '@/lib/email'
-import { sendSMS, formatOrderSMS, formatOrderSMSAdmin } from '@/lib/sms'
+import { sendSMS, formatOrderSMS } from '@/lib/sms'
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,18 +20,7 @@ export async function POST(request: NextRequest) {
       await sendOrderEmailCustomer(order)
     }
 
-    // Отправка SMS администратору
-    const adminPhone = process.env.ADMIN_PHONE || '+79991234567'
-    await sendSMS({
-      to: adminPhone,
-      message: formatOrderSMSAdmin({
-        orderNumber: order.orderNumber,
-        customerName: order.customerName,
-        total: order.total,
-      }),
-    })
-
-    // Отправка SMS клиенту
+    // Отправка SMS клиенту (если указан телефон)
     if (customerPhone) {
       await sendSMS({
         to: customerPhone,

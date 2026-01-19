@@ -359,6 +359,7 @@ export default function ContentPage() {
                 )}
                 <button
                   onClick={() => handleDeleteReview(review.id)}
+                  aria-label={`Удалить отзыв от ${review.author}`}
                   className="px-4 py-2 bg-red-400/20 text-red-400 border border-red-400/30 rounded-lg hover:bg-red-400/30 transition-all text-sm"
                 >
                   Удалить

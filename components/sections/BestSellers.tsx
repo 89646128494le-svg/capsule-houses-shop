@@ -186,9 +186,11 @@ export default function BestSellers() {
                         </Link>
                         <button 
                           onClick={() => handleAddToCart(product)}
-                          className="px-4 py-2 bg-gradient-hero text-deep-dark rounded-lg hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] transition-all text-sm font-medium"
+                          aria-label={`Добавить ${product.name} в корзину`}
+                          disabled={!product.inStock}
+                          className="px-4 py-2 bg-gradient-hero text-deep-dark rounded-lg hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          В корзину
+                          {product.inStock ? 'В корзину' : 'Нет в наличии'}
                         </button>
                       </div>
                     </div>

@@ -84,6 +84,7 @@ export default function ProductsPage() {
         </div>
         <button
           onClick={handleAdd}
+          aria-label="Добавить новый товар"
           className="flex items-center gap-2 px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all"
         >
           <Plus size={20} />
@@ -136,6 +137,7 @@ export default function ProductsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(product)}
+                        aria-label={`Редактировать ${product.name}`}
                         className="p-2 text-gray-400 hover:text-neon-cyan transition-colors"
                         title="Редактировать"
                       >
@@ -143,6 +145,7 @@ export default function ProductsPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(product.id)}
+                        aria-label={`Удалить ${product.name}`}
                         className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                         title="Удалить"
                       >
@@ -170,6 +173,7 @@ export default function ProductsPage() {
                 setIsModalOpen(false)
                 setEditingProduct(null)
               }}
+              aria-label="Закрыть"
               className="absolute top-4 right-4 p-2 text-gray-400 hover:text-neon-cyan transition-colors"
             >
               <X size={24} />

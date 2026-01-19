@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "node -e \"require('fs').rmSync('.next', {recursive: true, force: true}); require('fs').rmSync('node_modules/.cache', {recursive: true, force: true});\"",
+    "git:status": "git status",
+    "git:add": "git add .",
+    "git:commit": "git commit -m",
+    "git:push": "git push",
+    "git:update": "git add . && git commit -m \"Обновление проекта\" && git push"
   },
   "dependencies": {
     "framer-motion": "^11.18.2",

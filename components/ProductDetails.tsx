@@ -86,6 +86,8 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
+                aria-label={`Показать изображение ${index + 1} товара ${product.name}`}
+                aria-pressed={currentImageIndex === index}
                 className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                   currentImageIndex === index
                     ? 'border-neon-cyan'
@@ -147,14 +149,18 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleAddToCart}
-              className="flex-1 px-6 py-4 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all duration-300 flex items-center justify-center gap-2"
+              aria-label={`Добавить ${product.name} в корзину`}
+              disabled={!product.inStock}
+              className="flex-1 px-6 py-4 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShoppingCart size={20} />
-              В корзину
+              {product.inStock ? 'В корзину' : 'Нет в наличии'}
             </button>
             <button
               onClick={() => setIsQuickOrderOpen(true)}
-              className="flex-1 px-6 py-4 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all font-semibold flex items-center justify-center gap-2"
+              aria-label={`Купить ${product.name} в 1 клик`}
+              disabled={!product.inStock}
+              className="flex-1 px-6 py-4 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Купить в 1 клик
               <ArrowRight size={20} />
@@ -162,10 +168,18 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
           </div>
 
           {/* Availability */}
-          <div className="flex items-center gap-2 text-green-400">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span>В наличии</span>
-          </div>
+          {product.inStock && (
+            <div className="flex items-center gap-2 text-green-400">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" aria-hidden="true" />
+              <span>В наличии</span>
+            </div>
+          )}
+          {!product.inStock && (
+            <div className="flex items-center gap-2 text-red-400">
+              <span className="w-2 h-2 bg-red-400 rounded-full" aria-hidden="true" />
+              <span>Нет в наличии</span>
+            </div>
+          )}
         </div>
       </div>
 

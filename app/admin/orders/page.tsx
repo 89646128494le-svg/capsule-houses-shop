@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Search, Filter, MoreVertical, CheckCircle, XCircle, Truck, Package } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Search, Filter, XCircle, X, Send } from 'lucide-react'
 import { useOrdersStore, Order } from '@/store/ordersStore'
 import { useToastStore } from '@/store/toastStore'
 
@@ -16,7 +16,10 @@ export default function OrdersPage() {
   
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Order['status'] | 'all'>('all')
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [pendingStatusChange, setPendingStatusChange] = useState<{ orderId: number; status: Order['status'] } | null>(null)
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -59,9 +62,103 @@ export default function OrdersPage() {
     return labels[status]
   }
 
-  const handleStatusChange = (orderId: number, newStatus: Order['status']) => {
+  const handleStatusChange = async (orderId: number, newStatus: Order['status']) => {
+    const order = orders.find(o => o.id === orderId)
+    if (!order) return
+
+    // Если статус меняется на "отменен", показываем модальное окно для причины
+    if (newStatus === 'cancelled') {
+      setPendingStatusChange({ orderId, status: newStatus })
+      setShowCancelModal(true)
+      return
+    }
+
+    // Обновляем статус
     updateOrderStatus(orderId, newStatus)
-    addToast('Статус заказа обновлен', 'success')
+    
+    // Отправляем email покупателю, если есть email и статус не "новый"
+    if (order.customerEmail && newStatus !== 'new') {
+      setIsSendingEmail(true)
+      try {
+        const response = await fetch('/api/send-order-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order: {
+              orderNumber: order.orderNumber,
+              customerName: order.customerName,
+              items: order.items,
+              total: order.total,
+            },
+            status: newStatus,
+            customerEmail: order.customerEmail,
+          }),
+        })
+
+        if (response.ok) {
+          addToast('Статус заказа обновлен и письмо отправлено покупателю', 'success')
+        } else {
+          addToast('Статус заказа обновлен, но не удалось отправить письмо', 'warning')
+        }
+      } catch (error) {
+        addToast('Статус заказа обновлен, но произошла ошибка при отправке письма', 'warning')
+      } finally {
+        setIsSendingEmail(false)
+      }
+    } else {
+      addToast('Статус заказа обновлен', 'success')
+    }
+  }
+
+  const handleCancelOrder = async () => {
+    if (!pendingStatusChange || !cancelReason.trim()) {
+      addToast('Пожалуйста, укажите причину отмены', 'error')
+      return
+    }
+
+    const order = orders.find(o => o.id === pendingStatusChange.orderId)
+    if (!order) return
+
+    // Обновляем статус с причиной
+    updateOrderStatus(pendingStatusChange.orderId, 'cancelled', cancelReason)
+    
+    // Отправляем email покупателю
+    if (order.customerEmail) {
+      setIsSendingEmail(true)
+      try {
+        const response = await fetch('/api/send-order-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order: {
+              orderNumber: order.orderNumber,
+              customerName: order.customerName,
+              items: order.items,
+              total: order.total,
+            },
+            status: 'cancelled',
+            cancellationReason: cancelReason,
+            customerEmail: order.customerEmail,
+          }),
+        })
+
+        if (response.ok) {
+          addToast('Заказ отменен и письмо отправлено покупателю', 'success')
+        } else {
+          addToast('Заказ отменен, но не удалось отправить письмо', 'warning')
+        }
+      } catch (error) {
+        addToast('Заказ отменен, но произошла ошибка при отправке письма', 'warning')
+      } finally {
+        setIsSendingEmail(false)
+      }
+    } else {
+      addToast('Заказ отменен', 'success')
+    }
+
+    setShowCancelModal(false)
+    setCancelReason('')
+    setPendingStatusChange(null)
   }
 
   const handleDelete = (orderId: number) => {
@@ -176,6 +273,7 @@ export default function OrdersPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleDelete(order.id)}
+                        aria-label={`Удалить заказ ${order.orderNumber}`}
                         className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                         title="Удалить"
                       >
@@ -195,6 +293,87 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Модальное окно для отмены заказа */}
+      <AnimatePresence>
+        {showCancelModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => {
+                setShowCancelModal(false)
+                setCancelReason('')
+                setPendingStatusChange(null)
+              }}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative glassmorphism-light rounded-2xl p-8 max-w-md w-full border border-neon-cyan/30"
+            >
+              <button
+                onClick={() => {
+                  setShowCancelModal(false)
+                  setCancelReason('')
+                  setPendingStatusChange(null)
+                }}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-neon-cyan transition-colors"
+              >
+                <X size={24} />
+              </button>
+
+              <h2 className="text-2xl font-bold text-gradient mb-2">Отмена заказа</h2>
+              <p className="text-gray-400 mb-6">
+                Пожалуйста, укажите причину отмены заказа. Письмо с этой информацией будет отправлено покупателю.
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Причина отмены *</label>
+                  <textarea
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    placeholder="Например: Товар временно отсутствует на складе..."
+                    className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-cyan transition-colors min-h-[120px] resize-none"
+                    required
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowCancelModal(false)
+                      setCancelReason('')
+                      setPendingStatusChange(null)
+                    }}
+                    className="flex-1 px-6 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white hover:bg-black/70 transition-colors"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={handleCancelOrder}
+                    disabled={!cancelReason.trim() || isSendingEmail}
+                    className="flex-1 px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSendingEmail ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-deep-dark border-t-transparent rounded-full animate-spin" />
+                        Отправка...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={18} />
+                        Отменить заказ
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

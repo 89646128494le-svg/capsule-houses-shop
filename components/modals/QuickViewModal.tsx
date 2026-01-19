@@ -74,6 +74,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                 {/* Close Button */}
                 <button
                   onClick={onClose}
+                  aria-label="Закрыть"
                   className="absolute top-4 right-4 p-2 bg-black/70 rounded-lg text-gray-400 hover:text-neon-cyan transition-colors z-10"
                 >
                   <X size={24} />
@@ -158,6 +159,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                     <div className="flex flex-col sm:flex-row gap-3 pt-4">
                       <button
                         onClick={handleAddToCart}
+                        aria-label={`Добавить ${product.name} в корзину`}
                         className="flex-1 px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all duration-300 flex items-center justify-center gap-2"
                       >
                         <ShoppingCart size={20} />
@@ -165,6 +167,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                       </button>
                       <button
                         onClick={handleQuickOrder}
+                        aria-label={`Купить ${product.name} в 1 клик`}
                         className="flex-1 px-6 py-3 bg-transparent border border-neon-cyan text-neon-cyan rounded-lg hover:bg-neon-cyan hover:text-deep-dark transition-all font-semibold flex items-center justify-center gap-2"
                       >
                         Купить в 1 клик

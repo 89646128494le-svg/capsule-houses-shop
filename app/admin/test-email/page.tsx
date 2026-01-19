@@ -133,8 +133,8 @@ export default function TestEmailPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl font-bold text-gradient mb-2">Тестирование Email</h1>
-        <p className="text-gray-400">Проверка отправки писем покупателю и администратору</p>
+        <h1 className="text-4xl font-bold text-gradient mb-2">Отправить письмо</h1>
+        <p className="text-gray-400">Отправка писем покупателю или администратору</p>
       </div>
 
       {/* Настройки теста */}
@@ -143,7 +143,7 @@ export default function TestEmailPage() {
         animate={{ opacity: 1, y: 0 }}
         className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
       >
-        <h2 className="text-2xl font-bold text-white mb-6">Настройки теста</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">Настройки письма</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-gray-400 mb-2">Email администратора</label>
@@ -192,7 +192,7 @@ export default function TestEmailPage() {
         animate={{ opacity: 1, y: 0 }}
         className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
       >
-        <h2 className="text-2xl font-bold text-white mb-6">Отправка тестовых писем</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">Отправка писем</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             onClick={testAdminEmail}
@@ -228,7 +228,7 @@ export default function TestEmailPage() {
           animate={{ opacity: 1, y: 0 }}
           className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Результаты тестирования</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">Результаты отправки</h2>
           <div className="space-y-4">
             {results.admin && (
               <div className={`p-4 rounded-lg border ${

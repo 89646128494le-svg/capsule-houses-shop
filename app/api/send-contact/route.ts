@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email'
+import { formatContactEmailHTML } from '@/lib/email-templates'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +15,9 @@ export async function POST(request: NextRequest) {
 
     await sendEmail({
       to: adminEmail,
-      subject: `Сообщение от ${name}`,
+      subject: `📧 Новое сообщение с сайта от ${name}`,
       body: `Имя: ${name}\nEmail: ${email}\nТелефон: ${phone}\n\nСообщение:\n${message}`,
+      html: formatContactEmailHTML({ name, email, phone, message }),
     })
 
     return NextResponse.json({ success: true })

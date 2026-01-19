@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email'
+import { formatPartnerEmailHTML } from '@/lib/email-templates'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +15,9 @@ export async function POST(request: NextRequest) {
 
     await sendEmail({
       to: adminEmail,
-      subject: 'Новая заявка на партнёрство',
+      subject: `🤝 Новая заявка на партнёрство от ${company}`,
       body: `Компания: ${company}\nИмя: ${name}\nТелефон: ${phone}\nEmail: ${email}`,
+      html: formatPartnerEmailHTML({ company, name, phone, email }),
     })
 
     return NextResponse.json({ success: true })

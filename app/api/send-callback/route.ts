@@ -5,7 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { sendCallbackEmail } from '@/lib/email'
-import { sendSMS, formatCallbackSMS } from '@/lib/sms'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,13 +13,6 @@ export async function POST(request: NextRequest) {
 
     // Отправка Email администратору
     await sendCallbackEmail({ name, phone })
-
-    // Отправка SMS администратору
-    const adminPhone = process.env.ADMIN_PHONE || '+79991234567'
-    await sendSMS({
-      to: adminPhone,
-      message: formatCallbackSMS({ name, phone }),
-    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

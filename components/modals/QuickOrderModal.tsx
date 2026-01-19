@@ -61,21 +61,36 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
       addOrder(fullOrder)
       
       // Отправка через API route (безопасно, API ключи на сервере)
-      await fetch('/api/send-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order: fullOrder,
-          customerEmail: formData.email,
-          customerPhone: formData.phone,
-        }),
-      })
+      try {
+        const response = await fetch('/api/send-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order: fullOrder,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Ошибка отправки заказа')
+        }
+
+        addToast('Заказ успешно оформлен! Мы свяжемся с вами в ближайшее время.', 'success')
+        setFormData({ name: '', phone: '', email: '' })
+        setIsSubmitting(false)
+        onClose()
+      } catch (error) {
+        console.error('Ошибка отправки заказа:', error)
+        addToast('Заказ создан, но произошла ошибка при отправке уведомления. Мы свяжемся с вами.', 'warning')
+        setFormData({ name: '', phone: '', email: '' })
+        setIsSubmitting(false)
+        onClose()
+      }
+    } else {
+      addToast('Добавьте товары в корзину для оформления заказа', 'error')
+      setIsSubmitting(false)
     }
-    
-    addToast('Заказ успешно оформлен! Мы свяжемся с вами в ближайшее время.', 'success')
-    setFormData({ name: '', phone: '', email: '' })
-    setIsSubmitting(false)
-    onClose()
   }
 
   return (
@@ -104,7 +119,9 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
               {/* Close Button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-neon-cyan transition-colors"
+                disabled={isSubmitting}
+                aria-label="Закрыть"
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-neon-cyan transition-colors disabled:opacity-50"
               >
                 <X size={24} />
               </button>
@@ -155,6 +172,7 @@ export default function QuickOrderModal({ isOpen, onClose, productName }: QuickO
                 <button
                   type="submit"
                   disabled={isSubmitting}
+                  aria-label={isSubmitting ? 'Оформление заказа...' : 'Оформить заказ'}
                   className="w-full px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Оформление...' : 'Оформить заказ'}

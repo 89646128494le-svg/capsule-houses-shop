@@ -207,6 +207,7 @@ export default function ContactsContent() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
+                  aria-label={isSubmitting ? 'Отправка сообщения...' : 'Отправить сообщение'}
                   className="w-full px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg neon-button-glow hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Отправка...' : 'Отправить сообщение'}
