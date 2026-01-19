@@ -1,10 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CreditCard, Calendar, Truck, Wrench, CheckCircle } from 'lucide-react'
+import { CreditCard, Calendar, Truck, Wrench, CheckCircle, LucideIcon } from 'lucide-react'
 import { useContentStore } from '@/store/contentStore'
 
-const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const iconMap: Record<string, LucideIcon> = {
   CreditCard,
   Calendar,
   Truck,

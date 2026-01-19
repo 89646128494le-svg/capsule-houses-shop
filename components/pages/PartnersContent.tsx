@@ -1,12 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Handshake, TrendingUp, Users, Award, Mail } from 'lucide-react'
+import { Handshake, TrendingUp, Users, Award, Mail, LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
 import { useContentStore } from '@/store/contentStore'
 
-const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const iconMap: Record<string, LucideIcon> = {
   TrendingUp,
   Users,
   Award,
