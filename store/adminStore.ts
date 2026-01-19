@@ -15,9 +15,12 @@ export const useAdminStore = create<AdminStore>((set) => ({
   user: null,
   
   login: async (email: string, password: string) => {
-    // TODO: В реальном приложении здесь будет запрос к API
-    // Для демо используем простую проверку
-    if (email === 'admin@capsule.ru' && password === 'admin123') {
+    // В продакшене замените на запрос к API
+    // Для безопасности используйте переменные окружения
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@capsule.ru'
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
+    
+    if (email === adminEmail && password === adminPassword) {
       set({
         isAuthenticated: true,
         user: {

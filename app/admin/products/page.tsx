@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Trash2, Search, Save, X } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, Save, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { useProductsStore, Product } from '@/store/productsStore'
 import { useToastStore } from '@/store/toastStore'
 
@@ -265,6 +265,145 @@ export default function ProductsPage() {
                   rows={4}
                   className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors resize-none"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Фотографии и видео</label>
+                <div className="space-y-4">
+                  {/* Media URLs */}
+                  {editingProduct.images.map((image, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1 relative">
+                        {image.startsWith('data:') || image.startsWith('http') ? (
+                          image.startsWith('data:video') || image.includes('.mp4') || image.includes('.webm') ? (
+                            <video
+                              src={image}
+                              controls
+                              className="w-full h-32 object-cover rounded-lg border border-neon-cyan/30"
+                            />
+                          ) : (
+                            <img
+                              src={image}
+                              alt={`Медиа ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border border-neon-cyan/30"
+                            />
+                          )
+                        ) : (
+                          <div className="w-full h-32 bg-black/50 border border-neon-cyan/30 rounded-lg flex items-center justify-center">
+                            <ImageIcon size={24} className="text-gray-500" />
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={image}
+                        onChange={(e) => {
+                          const newImages = [...editingProduct.images]
+                          newImages[index] = e.target.value
+                          setEditingProduct({ ...editingProduct, images: newImages })
+                        }}
+                        placeholder="URL изображения или видео"
+                        className="flex-1 px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                      />
+                      <button
+                        onClick={() => {
+                          const newImages = editingProduct.images.filter((_, i) => i !== index)
+                          setEditingProduct({ ...editingProduct, images: newImages })
+                        }}
+                        className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {/* Add Media URL Button */}
+                  <button
+                    onClick={() => {
+                      setEditingProduct({
+                        ...editingProduct,
+                        images: [...editingProduct.images, ''],
+                      })
+                    }}
+                    className="w-full px-4 py-3 bg-black/50 border border-dashed border-neon-cyan/30 rounded-lg text-gray-400 hover:border-neon-cyan hover:text-neon-cyan transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus size={18} />
+                    Добавить URL изображения или видео
+                  </button>
+
+                  {/* File Upload - Images */}
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2">Загрузить изображения:</label>
+                    <label className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-gray-400 hover:border-neon-cyan hover:text-neon-cyan transition-colors cursor-pointer">
+                      <Upload size={18} />
+                      <span>Выбрать изображения</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || [])
+                          const newImagePromises = files.map((file) => {
+                            return new Promise<string>((resolve) => {
+                              const reader = new FileReader()
+                              reader.onloadend = () => {
+                                resolve(reader.result as string)
+                              }
+                              reader.readAsDataURL(file)
+                            })
+                          })
+
+                          Promise.all(newImagePromises).then((base64Images) => {
+                            setEditingProduct({
+                              ...editingProduct,
+                              images: [...editingProduct.images, ...base64Images],
+                            })
+                            addToast(`Загружено ${files.length} изображений`, 'success')
+                          })
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {/* File Upload - Videos */}
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2">Загрузить видео:</label>
+                    <label className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-gray-400 hover:border-neon-cyan hover:text-neon-cyan transition-colors cursor-pointer">
+                      <Upload size={18} />
+                      <span>Выбрать видео</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || [])
+                          const newVideoPromises = files.map((file) => {
+                            return new Promise<string>((resolve) => {
+                              const reader = new FileReader()
+                              reader.onloadend = () => {
+                                resolve(reader.result as string)
+                              }
+                              reader.readAsDataURL(file)
+                            })
+                          })
+
+                          Promise.all(newVideoPromises).then((base64Videos) => {
+                            setEditingProduct({
+                              ...editingProduct,
+                              images: [...editingProduct.images, ...base64Videos],
+                            })
+                            addToast(`Загружено ${files.length} видео`, 'success')
+                          })
+                        }}
+                      />
+                    </label>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Поддерживаются форматы: MP4, WebM, MOV. Максимальный размер: 50MB
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-4">

@@ -2,48 +2,25 @@
 
 import { motion } from 'framer-motion'
 import { Zap, Shield, Leaf, Wrench, TrendingUp, Home } from 'lucide-react'
+import { useContentStore } from '@/store/contentStore'
+
+const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  Zap,
+  Shield,
+  Leaf,
+  Wrench,
+  TrendingUp,
+  Home,
+}
 
 export default function AboutContent() {
-  const innovations = [
-    {
-      icon: Zap,
-      title: 'Инновационные технологии',
-      description: 'Использование современных материалов и технологий производства для создания долговечных и энергоэффективных домов.',
-    },
-    {
-      icon: Shield,
-      title: 'Высокое качество',
-      description: 'Строгий контроль качества на всех этапах производства. Гарантия на все материалы и работы.',
-    },
-    {
-      icon: Leaf,
-      title: 'Экологичность',
-      description: 'Использование экологически чистых материалов, безопасных для здоровья человека и окружающей среды.',
-    },
-    {
-      icon: Wrench,
-      title: 'Простота монтажа',
-      description: 'Модульная конструкция позволяет собрать дом за 1-3 дня без специальных навыков и сложного оборудования.',
-    },
-  ]
-
-  const materials = [
-    {
-      name: 'Каркас',
-      description: 'Прочный алюминиевый каркас с антикоррозийным покрытием',
-      icon: '🏗️',
-    },
-    {
-      name: 'Утепление',
-      description: 'Эковата и современные теплоизоляционные материалы',
-      icon: '🧱',
-    },
-    {
-      name: 'Умный замок',
-      description: 'Система умного дома с управлением через смартфон',
-      icon: '🔐',
-    },
-  ]
+  const pageData = useContentStore((state) => state.pageCustomData.about)
+  
+  const innovations = pageData?.innovations || []
+  const materials = pageData?.materials || []
+  const heroTitle = pageData?.heroTitle || 'О продукте'
+  const heroSubtitle = pageData?.heroSubtitle || 'Инновационные капсульные дома — это будущее комфортного и экологичного жилья. Мы создаем дома нового поколения с использованием передовых технологий.'
+  const galleryTitle = pageData?.galleryTitle || 'Реализованные проекты'
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
@@ -56,11 +33,10 @@ export default function AboutContent() {
           className="text-center mb-16"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gradient">О продукте</span>
+            <span className="text-gradient">{heroTitle}</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Инновационные капсульные дома — это будущее комфортного и экологичного жилья. 
-            Мы создаем дома нового поколения с использованием передовых технологий.
+            {heroSubtitle}
           </p>
         </motion.div>
 
@@ -71,10 +47,10 @@ export default function AboutContent() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {innovations.map((item, index) => {
-              const Icon = item.icon
+              const Icon = iconMap[item.icon] || Zap
               return (
                 <motion.div
-                  key={item.title}
+                  key={item.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -100,7 +76,7 @@ export default function AboutContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {materials.map((material, index) => (
               <motion.div
-                key={material.name}
+                key={material.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -124,7 +100,7 @@ export default function AboutContent() {
           className="mb-20"
         >
           <h2 className="text-3xl font-bold text-white mb-12 text-center">
-            Реализованные проекты
+            {galleryTitle}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (

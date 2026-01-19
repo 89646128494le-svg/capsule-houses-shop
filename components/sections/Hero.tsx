@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useContentStore } from '@/store/contentStore'
 
 export default function Hero() {
+  const heroContent = useContentStore((state) => state.heroContent)
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background Gradient */}
@@ -48,21 +50,17 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
           >
-            <span className="text-gradient">Капсульные дома</span>
-            <br />
-            <span className="text-white">будущего уже здесь</span>
+            <span className="text-gradient">{heroContent.title}</span>
           </motion.h1>
 
-          {/* Subtitle - Текст-рыба */}
+          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-lg sm:text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed"
           >
-            Инновационные решения для комфортной жизни. 
-            Быстрая сборка, экологичные материалы, умные технологии. 
-            Создайте свой идеальный дом за считанные дни.
+            {heroContent.subtitle}
           </motion.p>
 
           {/* CTA Button with Neon Glow */}
@@ -75,7 +73,7 @@ export default function Hero() {
               href="/catalog"
               className="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-hero text-deep-dark font-semibold rounded-lg neon-button-glow transition-all duration-300 group"
             >
-              <span>В каталог</span>
+              <span>{heroContent.ctaText}</span>
               <ArrowRight 
                 size={20} 
                 className="group-hover:translate-x-1 transition-transform" 

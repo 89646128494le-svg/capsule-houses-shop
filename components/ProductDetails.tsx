@@ -17,9 +17,9 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
   const addToast = useToastStore((state) => state.addToast)
-  const getProductById = useProductsStore((state) => state.getProductById)
-
-  const product = getProductById(productId)
+  const product = useProductsStore((state) => 
+    state.products.find((p) => p.id === productId)
+  )
 
   if (!product) {
     return (
@@ -45,6 +45,7 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
       price: product.price,
       dimensions: product.dimensions,
       guests: product.guests,
+      image: product.images[0] || undefined,
     })
     addToast(`${product.name} добавлен в корзину`, 'success')
   }
@@ -61,19 +62,27 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
             animate={{ opacity: 1 }}
             className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30"
           >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <div className="w-48 h-48 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
-                  <span className="text-8xl">🏠</span>
+            {product.images[currentImageIndex] && (product.images[currentImageIndex].startsWith('data:') || product.images[currentImageIndex].startsWith('http')) ? (
+              <img
+                src={product.images[currentImageIndex]}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center space-y-2">
+                  <div className="w-48 h-48 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
+                    <span className="text-8xl">🏠</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Изображение {currentImageIndex + 1}</p>
                 </div>
-                <p className="text-sm text-gray-600">Изображение {currentImageIndex + 1}</p>
               </div>
-            </div>
+            )}
           </motion.div>
 
           {/* Thumbnails */}
           <div className="grid grid-cols-4 gap-2">
-            {product.images.map((_, index) => (
+            {(product.images.length > 0 ? product.images : ['']).map((image, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
@@ -83,9 +92,17 @@ export default function ProductDetails({ productId }: ProductDetailsProps) {
                     : 'border-neon-cyan/20 hover:border-neon-cyan/50'
                 }`}
               >
-                <div className="w-full h-full bg-gradient-to-br from-deep-dark to-black flex items-center justify-center">
-                  <span className="text-2xl">🏠</span>
-                </div>
+                {image && (image.startsWith('data:') || image.startsWith('http')) ? (
+                  <img
+                    src={image}
+                    alt={`${product.name} ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-deep-dark to-black flex items-center justify-center">
+                    <span className="text-2xl">🏠</span>
+                  </div>
+                )}
               </button>
             ))}
           </div>

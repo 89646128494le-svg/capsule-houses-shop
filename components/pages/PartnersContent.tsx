@@ -4,6 +4,13 @@ import { motion } from 'framer-motion'
 import { Handshake, TrendingUp, Users, Award, Mail } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
+import { useContentStore } from '@/store/contentStore'
+
+const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  TrendingUp,
+  Users,
+  Award,
+}
 
 export default function PartnersContent() {
   const [formData, setFormData] = useState({
@@ -14,24 +21,12 @@ export default function PartnersContent() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const addToast = useToastStore((state) => state.addToast)
+  const pageData = useContentStore((state) => state.pageCustomData.partners)
 
-  const benefits = [
-    {
-      icon: TrendingUp,
-      title: 'Выгодные условия',
-      description: 'Специальные цены и условия для партнёров',
-    },
-    {
-      icon: Users,
-      title: 'Поддержка',
-      description: 'Персональный менеджер и техническая поддержка',
-    },
-    {
-      icon: Award,
-      title: 'Обучение',
-      description: 'Обучение ваших специалистов работе с продукцией',
-    },
-  ]
+  const benefits = pageData?.benefits || []
+  const requirements = pageData?.requirements || []
+  const heroTitle = pageData?.heroTitle || 'Партнёрам'
+  const heroSubtitle = pageData?.heroSubtitle || 'Станьте нашим партнером и получите выгодные условия сотрудничества.'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -79,20 +74,20 @@ export default function PartnersContent() {
             <Handshake size={40} className="text-neon-cyan" />
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gradient">Партнёрам</span>
+            <span className="text-gradient">{heroTitle}</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Станьте нашим партнёром и получите выгодные условия сотрудничества
+            {heroSubtitle}
           </p>
         </motion.div>
 
         {/* Benefits */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {benefits.map((benefit, index) => {
-            const Icon = benefit.icon
+            const Icon = iconMap[benefit.icon] || TrendingUp
             return (
               <motion.div
-                key={benefit.title}
+                key={benefit.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

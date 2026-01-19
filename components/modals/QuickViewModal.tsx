@@ -37,6 +37,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
       price: product.price,
       dimensions: product.dimensions,
       guests: product.guests,
+      image: product.images[0] || undefined,
     })
     addToast(`${product.name} добавлен в корзину`, 'success')
     onClose()
@@ -83,19 +84,27 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                   <div className="space-y-4">
                     {/* Main Image */}
                     <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center space-y-2">
-                          <div className="w-32 h-32 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
-                            <span className="text-6xl">🏠</span>
+                      {product.images[currentImageIndex] && (product.images[currentImageIndex].startsWith('data:') || product.images[currentImageIndex].startsWith('http')) ? (
+                        <img
+                          src={product.images[currentImageIndex]}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center space-y-2">
+                            <div className="w-32 h-32 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
+                              <span className="text-6xl">🏠</span>
+                            </div>
+                            <p className="text-sm text-gray-600">Изображение {currentImageIndex + 1}</p>
                           </div>
-                          <p className="text-sm text-gray-600">Изображение {currentImageIndex + 1}</p>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Thumbnails */}
                     <div className="grid grid-cols-4 gap-2">
-                      {product.images.map((_, index) => (
+                      {(product.images.length > 0 ? product.images : ['']).map((image, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
@@ -105,9 +114,17 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                               : 'border-neon-cyan/20'
                           }`}
                         >
-                          <div className="w-full h-full bg-gradient-to-br from-deep-dark to-black flex items-center justify-center">
-                            <span className="text-2xl">🏠</span>
-                          </div>
+                          {image && (image.startsWith('data:') || image.startsWith('http')) ? (
+                            <img
+                              src={image}
+                              alt={`${product.name} ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-deep-dark to-black flex items-center justify-center">
+                              <span className="text-2xl">🏠</span>
+                            </div>
+                          )}
                         </button>
                       ))}
                     </div>

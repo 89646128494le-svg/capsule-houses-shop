@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ShoppingCart, Eye, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
@@ -12,6 +12,11 @@ import QuickOrderModal from '@/components/modals/QuickOrderModal'
 
 export default function BestSellers() {
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
   const [quickViewProduct, setQuickViewProduct] = useState<ReturnType<typeof useProductsStore.getState>['products'][0] | null>(null)
   const [quickOrderProduct, setQuickOrderProduct] = useState<ReturnType<typeof useProductsStore.getState>['products'][0] | null>(null)
   const products = useProductsStore((state) => state.getProducts())
@@ -36,6 +41,7 @@ export default function BestSellers() {
       price: product.price,
       dimensions: product.dimensions,
       guests: product.guests,
+      image: product.images[0] || undefined,
     })
     addToast(`${product.name} добавлен в корзину`, 'success')
   }
@@ -51,6 +57,7 @@ export default function BestSellers() {
       price: product.price,
       dimensions: product.dimensions,
       guests: product.guests,
+      image: product.images[0] || undefined,
     })
     addToast(`${product.name} добавлен в корзину`, 'success')
   }
@@ -77,8 +84,9 @@ export default function BestSellers() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {bestSellers.map((product, index) => {
-            const [currentImageIndex, setCurrentImageIndex] = useState(0)
             const isHovered = hoveredProduct === product.id
+            const currentImageIndex = isHovered && product.images.length > 1 ? 1 : 0
+            const imageUrl = product.images[currentImageIndex]
 
             return (
               <motion.div
@@ -89,26 +97,31 @@ export default function BestSellers() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 onMouseEnter={() => {
                   setHoveredProduct(product.id)
-                  setCurrentImageIndex(1)
                 }}
                 onMouseLeave={() => {
                   setHoveredProduct(null)
-                  setCurrentImageIndex(0)
                 }}
                 className="group relative"
               >
                 <div className="glassmorphism-light rounded-2xl overflow-hidden border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all duration-300 h-full flex flex-col">
                   {/* Image Container */}
                   <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-deep-dark to-black">
-                    {/* Placeholder Image */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center space-y-2">
-                        <div className="w-24 h-24 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
-                          <span className="text-4xl">🏠</span>
+                    {isMounted && imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http')) ? (
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center space-y-2">
+                          <div className="w-24 h-24 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
+                            <span className="text-4xl">🏠</span>
+                          </div>
+                          <p className="text-xs text-gray-600">Изображение не загружено</p>
                         </div>
-                        <p className="text-xs text-gray-600">Изображение {currentImageIndex + 1}</p>
                       </div>
-                    </div>
+                    )}
 
                     {/* Image Transition Overlay */}
                     <motion.div

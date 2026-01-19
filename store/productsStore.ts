@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export interface Product {
   id: number
@@ -73,53 +74,55 @@ interface ProductsStore {
   deleteProduct: (id: number) => void
 }
 
-export const useProductsStore = create<ProductsStore>((set, get) => ({
-  products: mockProducts,
-  
-  getProducts: () => get().products,
-  
-  getProductById: (id) => {
-    return get().products.find((p) => p.id === id)
-  },
-  
-  getProductsByCategory: (category) => {
-    if (category === 'all') return get().products
-    return get().products.filter((p) => p.category === category)
-  },
-  
-  getProductsByGuests: (guests) => {
-    return get().products.filter((p) => p.guests === guests)
-  },
-  
-  getProductsByPriceRange: (min, max) => {
-    return get().products.filter((p) => p.price >= min && p.price <= max)
-  },
-  
-  updateProduct: (id, updatedProduct) => {
-    set((state) => ({
-      products: state.products.map((p) =>
-        p.id === id ? { ...p, ...updatedProduct } : p
-      ),
-    }))
-    // TODO: Сохранение в базу данных через API
-    // await fetch('/api/products/' + id, { method: 'PUT', body: JSON.stringify(updatedProduct) })
-  },
-  
-  addProduct: (product) => {
-    const newId = Math.max(...get().products.map((p) => p.id), 0) + 1
-    const newProduct: Product = { ...product, id: newId }
-    set((state) => ({
-      products: [...state.products, newProduct],
-    }))
-    // TODO: Сохранение в базу данных через API
-    // await fetch('/api/products', { method: 'POST', body: JSON.stringify(newProduct) })
-  },
-  
-  deleteProduct: (id) => {
-    set((state) => ({
-      products: state.products.filter((p) => p.id !== id),
-    }))
-    // TODO: Удаление из базы данных через API
-    // await fetch('/api/products/' + id, { method: 'DELETE' })
-  },
-}))
+export const useProductsStore = create<ProductsStore>()(
+  persist(
+    (set, get) => ({
+      products: mockProducts,
+      
+      getProducts: () => get().products,
+      
+      getProductById: (id) => {
+        return get().products.find((p) => p.id === id)
+      },
+      
+      getProductsByCategory: (category) => {
+        if (category === 'all') return get().products
+        return get().products.filter((p) => p.category === category)
+      },
+      
+      getProductsByGuests: (guests) => {
+        return get().products.filter((p) => p.guests === guests)
+      },
+      
+      getProductsByPriceRange: (min, max) => {
+        return get().products.filter((p) => p.price >= min && p.price <= max)
+      },
+      
+      updateProduct: (id, updatedProduct) => {
+        set((state) => ({
+          products: state.products.map((p) =>
+            p.id === id ? { ...p, ...updatedProduct } : p
+          ),
+        }))
+      },
+      
+      addProduct: (product) => {
+        const newId = Math.max(...get().products.map((p) => p.id), 0) + 1
+        const newProduct: Product = { ...product, id: newId }
+        set((state) => ({
+          products: [...state.products, newProduct],
+        }))
+      },
+      
+      deleteProduct: (id) => {
+        set((state) => ({
+          products: state.products.filter((p) => p.id !== id),
+        }))
+      },
+    }),
+    {
+      name: 'capsule-products-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+)

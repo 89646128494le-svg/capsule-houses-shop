@@ -2,41 +2,22 @@
 
 import { motion } from 'framer-motion'
 import { CreditCard, Calendar, Truck, Wrench, CheckCircle } from 'lucide-react'
+import { useContentStore } from '@/store/contentStore'
+
+const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  CreditCard,
+  Calendar,
+  Truck,
+  Wrench,
+}
 
 export default function PaymentContent() {
-  const stages = [
-    {
-      icon: CreditCard,
-      title: 'Предоплата',
-      description: '30% от стоимости при оформлении заказа',
-      time: 'Сразу',
-    },
-    {
-      icon: Calendar,
-      title: 'Производство',
-      description: 'Изготовление модулей на производстве',
-      time: '2-3 недели',
-    },
-    {
-      icon: Truck,
-      title: 'Доставка',
-      description: 'Доставка до вашего участка',
-      time: '1-3 дня',
-    },
-    {
-      icon: Wrench,
-      title: 'Сборка',
-      description: 'Профессиональная сборка нашими специалистами',
-      time: '1-3 дня',
-    },
-  ]
+  const pageData = useContentStore((state) => state.pageCustomData.payment)
 
-  const paymentMethods = [
-    { name: 'Банковские карты', icon: '💳' },
-    { name: 'Рассрочка', icon: '📅' },
-    { name: 'СБП (Система быстрых платежей)', icon: '📱' },
-    { name: 'Банковский перевод', icon: '🏦' },
-  ]
+  const stages = pageData?.stages || []
+  const paymentMethods = pageData?.paymentMethods || []
+  const heroTitle = pageData?.heroTitle || 'Оплата и доставка'
+  const heroSubtitle = pageData?.heroSubtitle || 'Прозрачные условия оплаты и быстрая доставка по всей России.'
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
@@ -49,10 +30,10 @@ export default function PaymentContent() {
           className="text-center mb-16"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gradient">Оплата и доставка</span>
+            <span className="text-gradient">{heroTitle}</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Прозрачные условия оплаты и быстрая доставка по всей России
+            {heroSubtitle}
           </p>
         </motion.div>
 
@@ -63,10 +44,10 @@ export default function PaymentContent() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stages.map((stage, index) => {
-              const Icon = stage.icon
+              const Icon = iconMap[stage.icon] || CreditCard
               return (
                 <motion.div
-                  key={stage.title}
+                  key={stage.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -101,7 +82,7 @@ export default function PaymentContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {paymentMethods.map((method, index) => (
               <div
-                key={method.name}
+                key={method.id}
                 className="glassmorphism-light rounded-2xl p-6 border border-neon-cyan/20 flex items-center gap-4"
               >
                 <div className="text-4xl">{method.icon}</div>

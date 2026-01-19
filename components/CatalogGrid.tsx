@@ -280,14 +280,22 @@ export default function CatalogGrid() {
                         <div className="glassmorphism-light rounded-2xl overflow-hidden border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all duration-300 h-full flex flex-col">
                           {/* Image */}
                           <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-deep-dark to-black">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="text-center space-y-2">
-                                <div className="w-24 h-24 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
-                                  <span className="text-4xl">🏠</span>
+                            {product.images[0] && (product.images[0].startsWith('data:') || product.images[0].startsWith('http')) ? (
+                              <img
+                                src={product.images[0]}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center space-y-2">
+                                  <div className="w-24 h-24 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
+                                    <span className="text-4xl">🏠</span>
+                                  </div>
+                                  <p className="text-xs text-gray-600">Фото товара</p>
                                 </div>
-                                <p className="text-xs text-gray-600">Фото товара</p>
                               </div>
-                            </div>
+                            )}
                             {!product.inStock && (
                               <div className="absolute top-4 left-4 px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full text-xs font-medium">
                                 Нет в наличии

@@ -3,29 +3,18 @@
 import { motion } from 'framer-motion'
 import { CheckCircle } from 'lucide-react'
 import { useState } from 'react'
+import { useContentStore } from '@/store/contentStore'
 
 export default function EquipmentContent() {
-  const [selectedOptions, setSelectedOptions] = useState<number[]>([])
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+  const pageData = useContentStore((state) => state.pageCustomData.equipment)
 
-  const baseEquipment = [
-    { id: 1, name: 'Алюминиевый каркас', included: true },
-    { id: 2, name: 'Утепление эковатой', included: true },
-    { id: 3, name: 'Внутренняя отделка', included: true },
-    { id: 4, name: 'Окна и двери', included: true },
-    { id: 5, name: 'Электрика', included: true },
-    { id: 6, name: 'Сантехника', included: true },
-  ]
+  const baseEquipment = pageData?.baseEquipment || []
+  const additionalOptions = pageData?.additionalOptions || []
+  const heroTitle = pageData?.heroTitle || 'Комплектация'
+  const heroSubtitle = pageData?.heroSubtitle || 'Выберите базовую комплектацию и дополнительные опции для вашего дома.'
 
-  const additionalOptions = [
-    { id: 101, name: 'Умный дом (управление через смартфон)', price: 50000 },
-    { id: 102, name: 'Солнечные панели', price: 150000 },
-    { id: 103, name: 'Система вентиляции с рекуперацией', price: 80000 },
-    { id: 104, name: 'Теплый пол', price: 60000 },
-    { id: 105, name: 'Мебель в комплекте', price: 200000 },
-    { id: 106, name: 'Дополнительное утепление', price: 40000 },
-  ]
-
-  const toggleOption = (id: number) => {
+  const toggleOption = (id: string) => {
     setSelectedOptions((prev) =>
       prev.includes(id) ? prev.filter((opt) => opt !== id) : [...prev, id]
     )
@@ -33,7 +22,7 @@ export default function EquipmentContent() {
 
   const totalAdditional = additionalOptions
     .filter((opt) => selectedOptions.includes(opt.id))
-    .reduce((sum, opt) => sum + opt.price, 0)
+    .reduce((sum, opt) => sum + (opt.price || 0), 0)
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -54,10 +43,10 @@ export default function EquipmentContent() {
           className="text-center mb-16"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gradient">Комплектация</span>
+            <span className="text-gradient">{heroTitle}</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Выберите базовую комплектацию и дополнительные опции для вашего дома
+            {heroSubtitle}
           </p>
         </motion.div>
 

@@ -4,8 +4,10 @@ import { motion } from 'framer-motion'
 import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useToastStore } from '@/store/toastStore'
+import { useContentStore } from '@/store/contentStore'
 
 export default function ContactsContent() {
+  const footerContent = useContentStore((state) => state.footerContent)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -80,8 +82,8 @@ export default function ContactsContent() {
                 </div>
                 <div>
                   <div className="text-gray-400 text-sm">Телефон</div>
-                  <a href="tel:+79991234567" className="text-white hover:text-neon-cyan transition-colors">
-                    +7 (999) 123-45-67
+                  <a href={`tel:${footerContent.contacts.phone.replace(/\s/g, '')}`} className="text-white hover:text-neon-cyan transition-colors">
+                    {footerContent.contacts.phone}
                   </a>
                 </div>
               </div>
@@ -94,8 +96,8 @@ export default function ContactsContent() {
                 </div>
                 <div>
                   <div className="text-gray-400 text-sm">Email</div>
-                  <a href="mailto:info@capsulehouses.ru" className="text-white hover:text-neon-cyan transition-colors">
-                    info@capsulehouses.ru
+                  <a href={`mailto:${footerContent.contacts.email}`} className="text-white hover:text-neon-cyan transition-colors">
+                    {footerContent.contacts.email}
                   </a>
                 </div>
               </div>
@@ -108,9 +110,8 @@ export default function ContactsContent() {
                 </div>
                 <div>
                   <div className="text-gray-400 text-sm mb-2">Адрес</div>
-                  <div className="text-white">
-                    г. Москва, ул. Примерная, д. 1<br />
-                    Офис: пн-пт, 9:00-18:00
+                  <div className="text-white whitespace-pre-line">
+                    {footerContent.contacts.address}
                   </div>
                 </div>
               </div>
@@ -119,25 +120,28 @@ export default function ContactsContent() {
             {/* Messengers */}
             <div className="glassmorphism-light rounded-2xl p-6 border border-neon-cyan/20">
               <div className="text-gray-400 text-sm mb-4">Мессенджеры</div>
-              <div className="flex gap-4">
-                <a
-                  href="https://wa.me/79991234567"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 hover:bg-green-500/30 transition-all"
-                >
-                  <MessageCircle size={20} />
-                  WhatsApp
-                </a>
-                <a
-                  href="https://t.me/capsulehouses"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 hover:bg-blue-500/30 transition-all"
-                >
-                  <MessageCircle size={20} />
-                  Telegram
-                </a>
+              <div className="flex gap-4 flex-wrap">
+                {footerContent.socialLinks.map((link) => {
+                  if (link.id === 'whatsapp' || link.id === 'telegram') {
+                    return (
+                      <a
+                        key={link.id}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-all ${
+                          link.id === 'whatsapp'
+                            ? 'bg-green-500/20 border-green-500/30 text-green-400 hover:bg-green-500/30'
+                            : 'bg-blue-500/20 border-blue-500/30 text-blue-400 hover:bg-blue-500/30'
+                        }`}
+                      >
+                        <MessageCircle size={20} />
+                        {link.name}
+                      </a>
+                    )
+                  }
+                  return null
+                })}
               </div>
             </div>
 

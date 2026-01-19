@@ -1,12 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useToastStore } from '@/store/toastStore'
 import Link from 'next/link'
+import CheckoutModal from './modals/CheckoutModal'
 
 export default function CartContent() {
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const items = useCartStore((state) => state.items)
   const updateQuantity = useCartStore((state) => state.updateQuantity)
   const removeItem = useCartStore((state) => state.removeItem)
@@ -59,9 +62,17 @@ export default function CartContent() {
               className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
             >
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* Image Placeholder */}
-                <div className="w-full sm:w-32 h-32 rounded-lg bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30 flex items-center justify-center flex-shrink-0">
-                  <span className="text-4xl">🏠</span>
+                {/* Image */}
+                <div className="w-full sm:w-32 h-32 rounded-lg bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  {item.image && (item.image.startsWith('data:') || item.image.startsWith('http')) ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl">🏠</span>
+                  )}
                 </div>
 
                 {/* Item Info */}
@@ -131,12 +142,12 @@ export default function CartContent() {
               </div>
             </div>
 
-            <Link
-              href="/checkout"
+            <button
+              onClick={() => setIsCheckoutOpen(true)}
               className="block w-full px-6 py-4 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all duration-300 text-center mb-4"
             >
               Оформить заказ
-            </Link>
+            </button>
             
             <Link
               href="/catalog"
@@ -147,6 +158,12 @@ export default function CartContent() {
           </div>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+      />
     </div>
   )
 }

@@ -2,47 +2,19 @@
 
 import { motion } from 'framer-motion'
 import { Zap, Shield, Clock, Leaf, Wrench, TrendingUp } from 'lucide-react'
+import { useContentStore } from '@/store/contentStore'
 
-const advantages = [
-  {
-    icon: Zap,
-    title: 'Быстрая сборка',
-    description: 'Монтаж за 1-3 дня без сложных фундаментов',
-    color: 'from-yellow-400 to-orange-500',
-  },
-  {
-    icon: Shield,
-    title: 'Высокое качество',
-    description: 'Современные материалы и технологии производства',
-    color: 'from-blue-400 to-cyan-500',
-  },
-  {
-    icon: Clock,
-    title: 'Экономия времени',
-    description: 'От заказа до заселения всего 2-4 недели',
-    color: 'from-green-400 to-emerald-500',
-  },
-  {
-    icon: Leaf,
-    title: 'Экологичность',
-    description: 'Экологичные материалы, безопасные для здоровья',
-    color: 'from-green-500 to-teal-600',
-  },
-  {
-    icon: Wrench,
-    title: 'Простота монтажа',
-    description: 'Не требует специальных навыков для установки',
-    color: 'from-purple-400 to-pink-500',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Рентабельность',
-    description: 'Низкие затраты на эксплуатацию и обслуживание',
-    color: 'from-cyan-400 to-blue-500',
-  },
-]
+const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  Zap,
+  Shield,
+  Clock,
+  Leaf,
+  Wrench,
+  TrendingUp,
+}
 
 export default function Advantages() {
+  const advantages = useContentStore((state) => state.advantages)
   return (
     <section className="relative py-20 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto">
@@ -65,10 +37,10 @@ export default function Advantages() {
         {/* Advantages Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {advantages.map((advantage, index) => {
-            const Icon = advantage.icon
+            const Icon = iconMap[advantage.icon] || Zap
             return (
               <motion.div
-                key={advantage.title}
+                key={advantage.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

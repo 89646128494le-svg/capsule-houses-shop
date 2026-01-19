@@ -91,11 +91,20 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
     // })
     // return response.ok
     
-    console.log('📧 Email отправка:', {
-      to: data.to,
-      subject: data.subject,
-      body: data.body.substring(0, 100) + '...',
-    })
+    // Детальное логирование для отладки
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📧 EMAIL ОТПРАВКА')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📬 Кому:', data.to)
+    console.log('📝 Тема:', data.subject)
+    console.log('📄 От:', data.from || process.env.EMAIL_FROM || 'noreply@capsulehouses.ru')
+    console.log('📋 Содержание (первые 200 символов):')
+    console.log(data.body.substring(0, 200) + (data.body.length > 200 ? '...' : ''))
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('⚠️  ВНИМАНИЕ: Email отправка симулируется!')
+    console.log('   Для реальной отправки настройте lib/email.ts')
+    console.log('   Раскомментируйте код для Resend/SendGrid')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
     // Симуляция отправки (удалите в продакшене)
     await new Promise((resolve) => setTimeout(resolve, 1000))

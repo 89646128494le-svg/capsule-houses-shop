@@ -2,12 +2,144 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle, Video, X, Phone, Mail, MapPin, Globe } from 'lucide-react'
-import { useContentStore, Review, Promotion } from '@/store/contentStore'
+import { FileText, Image, Edit, Save, Plus, Trash2, CheckCircle, XCircle, Video, X, Phone, Mail, MapPin, Globe, GripVertical, Layout, Eye, EyeOff } from 'lucide-react'
+import { useContentStore, Review, Promotion, PageContent, PageCustomData, InnovationItem, MaterialItem } from '@/store/contentStore'
 import { useToastStore } from '@/store/toastStore'
+import { useSettingsStore } from '@/store/settingsStore'
+
+// Компонент для редактирования страниц (отдельный компонент для правильного использования hooks)
+function PageEditorSection({ 
+  pages, 
+  updatePage, 
+  addToast,
+  pageCustomData,
+  updatePageCustomData,
+  pageBlocks,
+  updatePageBlocks,
+  togglePageBlock,
+}: { 
+  pages: PageContent[]
+  updatePage: (slug: string, content: Partial<PageContent>) => void
+  addToast: (message: string, type?: any) => void
+  pageCustomData: PageCustomData
+  updatePageCustomData: (pageSlug: string, data: any) => void
+  pageBlocks: Record<string, any[]>
+  updatePageBlocks: (pageSlug: string, blocks: any[]) => void
+  togglePageBlock: (pageSlug: string, blockId: string, enabled: boolean) => void
+}) {
+  const [editingPages, setEditingPages] = useState<Record<string, Partial<PageContent>>>({})
+  const [editingPageData, setEditingPageData] = useState<Record<string, any>>({})
+  
+  const handleChange = (pageSlug: string, field: string, value: string) => {
+    setEditingPages((prev) => ({
+      ...prev,
+      [pageSlug]: {
+        ...prev[pageSlug],
+        ...pages.find((p) => p.slug === pageSlug),
+        [field]: value,
+      },
+    }))
+  }
+  
+  const getPageForm = (pageSlug: string) => {
+    if (editingPages[pageSlug]) {
+      return editingPages[pageSlug]
+    }
+    const page = pages.find((p) => p.slug === pageSlug)
+    return page ? { title: page.title, content: page.content } : { title: '', content: '' }
+  }
+  
+  const getPageData = (slug: string) => {
+    if (editingPageData[slug]) {
+      return editingPageData[slug]
+    }
+    return pageCustomData[slug as keyof typeof pageCustomData] || null
+  }
+
+  const updatePageDataField = (slug: string, field: string, value: any) => {
+    setEditingPageData((prev) => ({
+      ...prev,
+      [slug]: {
+        ...getPageData(slug),
+        [field]: value,
+      },
+    }))
+  }
+
+  const savePageData = (slug: string) => {
+    const data = editingPageData[slug] || getPageData(slug)
+    if (data) {
+      updatePageCustomData(slug, data)
+      addToast(`Блоки страницы "${slug}" обновлены`, 'success')
+      setEditingPageData((prev) => {
+        const newPrev = { ...prev }
+        delete newPrev[slug]
+        return newPrev
+      })
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {pages.map((page) => {
+        const pageForm = getPageForm(page.slug)
+        const pageData = getPageData(page.slug)
+
+        return (
+          <motion.div
+            key={page.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">{page.title}</h2>
+            
+            {/* Базовое редактирование (Title & Content) */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Заголовок</label>
+                <input
+                  type="text"
+                  value={pageForm.title || ''}
+                  onChange={(e) => handleChange(page.slug, 'title', e.target.value)}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Содержание</label>
+                <textarea
+                  value={pageForm.content || ''}
+                  onChange={(e) => handleChange(page.slug, 'content', e.target.value)}
+                  rows={6}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors resize-none"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  updatePage(page.slug, pageForm)
+                  addToast(`Страница "${page.title}" обновлена`, 'success')
+                  setEditingPages((prev) => {
+                    const newPrev = { ...prev }
+                    delete newPrev[page.slug]
+                    return newPrev
+                  })
+                }}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить базовую информацию
+              </button>
+            </div>
+
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function ContentPage() {
-  const [activeTab, setActiveTab] = useState<'reviews' | 'promotions' | 'contacts'>('reviews')
+  const [activeTab, setActiveTab] = useState<'reviews' | 'promotions' | 'contacts' | 'pages' | 'settings' | 'homepage'>('reviews')
   const reviews = useContentStore((state) => state.reviews)
   const promotions = useContentStore((state) => state.promotions)
   const updateReview = useContentStore((state) => state.updateReview)
@@ -20,6 +152,22 @@ export default function ContentPage() {
   const updateContactInfo = useContentStore((state) => state.updateContactInfo)
   const updateSocialLink = useContentStore((state) => state.updateSocialLink)
   const updateLegalInfo = useContentStore((state) => state.updateLegalInfo)
+  const pages = useContentStore((state) => state.pages)
+  const updatePage = useContentStore((state) => state.updatePage)
+  const homePageBlocks = useContentStore((state) => state.homePageBlocks)
+  const updateHomePageBlocks = useContentStore((state) => state.updateHomePageBlocks)
+  const toggleBlock = useContentStore((state) => state.toggleBlock)
+  const advantages = useContentStore((state) => state.advantages)
+  const updateAdvantages = useContentStore((state) => state.updateAdvantages)
+  const heroContent = useContentStore((state) => state.heroContent)
+  const updateHeroContent = useContentStore((state) => state.updateHeroContent)
+  const pageCustomData = useContentStore((state) => state.pageCustomData)
+  const updatePageCustomData = useContentStore((state) => state.updatePageCustomData)
+  const pageBlocks = useContentStore((state) => state.pageBlocks)
+  const updatePageBlocks = useContentStore((state) => state.updatePageBlocks)
+  const togglePageBlock = useContentStore((state) => state.togglePageBlock)
+  const designSettings = useSettingsStore((state) => state.designSettings)
+  const updateDesignSettings = useSettingsStore((state) => state.updateDesignSettings)
   const addToast = useToastStore((state) => state.addToast)
   
   const [contactForm, setContactForm] = useState({
@@ -120,6 +268,50 @@ export default function ContentPage() {
         >
           <Image size={20} className="inline mr-2" />
           Акции ({promotions.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('contacts')}
+          className={`px-6 py-3 font-medium transition-colors ${
+            activeTab === 'contacts'
+              ? 'text-neon-cyan border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-neon-cyan'
+          }`}
+        >
+          <Phone size={20} className="inline mr-2" />
+          Контакты
+        </button>
+        <button
+          onClick={() => setActiveTab('pages')}
+          className={`px-6 py-3 font-medium transition-colors ${
+            activeTab === 'pages'
+              ? 'text-neon-cyan border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-neon-cyan'
+          }`}
+        >
+          <FileText size={20} className="inline mr-2" />
+          Страницы
+        </button>
+        <button
+          onClick={() => setActiveTab('homepage')}
+          className={`px-6 py-3 font-medium transition-colors ${
+            activeTab === 'homepage'
+              ? 'text-neon-cyan border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-neon-cyan'
+          }`}
+        >
+          <Layout size={20} className="inline mr-2" />
+          Главная страница
+        </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`px-6 py-3 font-medium transition-colors ${
+            activeTab === 'settings'
+              ? 'text-neon-cyan border-b-2 border-neon-cyan'
+              : 'text-gray-400 hover:text-neon-cyan'
+          }`}
+        >
+          <Globe size={20} className="inline mr-2" />
+          Настройки
         </button>
       </div>
 
@@ -627,6 +819,290 @@ export default function ContentPage() {
                   updateLegalInfo(legalForm)
                   addToast('Юридическая информация обновлена', 'success')
                 }}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Pages Tab */}
+      {activeTab === 'pages' && (
+        <PageEditorSection
+          pages={pages}
+          updatePage={updatePage}
+          addToast={addToast}
+          pageCustomData={pageCustomData}
+          updatePageCustomData={updatePageCustomData}
+          pageBlocks={pageBlocks}
+          updatePageBlocks={updatePageBlocks}
+          togglePageBlock={togglePageBlock}
+        />
+      )}
+
+      {/* Settings Tab */}
+      {activeTab === 'settings' && (
+        <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Настройки дизайна</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Основной цвет</label>
+                <div className="flex gap-4 items-center">
+                  <input
+                    type="color"
+                    value={designSettings.primaryColor}
+                    onChange={(e) => updateDesignSettings({ primaryColor: e.target.value })}
+                    className="w-20 h-12 rounded-lg border border-neon-cyan/30 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={designSettings.primaryColor}
+                    onChange={(e) => updateDesignSettings({ primaryColor: e.target.value })}
+                    className="flex-1 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                    placeholder="#00f2ff"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Цвет текста</label>
+                <div className="flex gap-4 items-center">
+                  <input
+                    type="color"
+                    value={designSettings.textColor}
+                    onChange={(e) => updateDesignSettings({ textColor: e.target.value })}
+                    className="w-20 h-12 rounded-lg border border-neon-cyan/30 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={designSettings.textColor}
+                    onChange={(e) => updateDesignSettings({ textColor: e.target.value })}
+                    className="flex-1 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                    placeholder="#ffffff"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Логотип (URL или загрузите файл)</label>
+                <div className="space-y-4">
+                  {designSettings.logoImage && (
+                    <div className="w-32 h-32 rounded-lg overflow-hidden border border-neon-cyan/30">
+                      <img
+                        src={designSettings.logoImage}
+                        alt="Logo"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    value={designSettings.logoImage}
+                    onChange={(e) => updateDesignSettings({ logoImage: e.target.value })}
+                    className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                    placeholder="URL логотипа"
+                  />
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-gray-300 hover:border-neon-cyan hover:text-neon-cyan transition-all cursor-pointer">
+                    <Image size={18} />
+                    <span>Загрузить логотип</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          const reader = new FileReader()
+                          reader.onload = (event) => {
+                            const result = event.target?.result as string
+                            updateDesignSettings({ logoImage: result })
+                          }
+                          reader.readAsDataURL(file)
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  addToast('Настройки дизайна сохранены', 'success')
+                }}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Homepage Blocks Tab */}
+      {activeTab === 'homepage' && (
+        <div className="space-y-6">
+          {/* Hero Content Editor */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Главный экран (Hero)</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Заголовок</label>
+                <input
+                  type="text"
+                  value={heroContent.title}
+                  onChange={(e) => updateHeroContent({ title: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Подзаголовок</label>
+                <textarea
+                  value={heroContent.subtitle}
+                  onChange={(e) => updateHeroContent({ subtitle: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Текст кнопки</label>
+                <input
+                  type="text"
+                  value={heroContent.ctaText}
+                  onChange={(e) => updateHeroContent({ ctaText: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                />
+              </div>
+              <button
+                onClick={() => addToast('Hero обновлен', 'success')}
+                className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
+              >
+                <Save size={20} />
+                Сохранить
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Blocks Order & Visibility */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Управление блоками главной страницы</h2>
+            <p className="text-gray-400 mb-6 text-sm">Перетащите блоки для изменения порядка. Отключите ненужные блоки.</p>
+            
+            <div className="space-y-3">
+              {[...homePageBlocks].sort((a, b) => a.order - b.order).map((block) => {
+                const blockNames: Record<string, string> = {
+                  hero: 'Главный экран',
+                  steps: 'Шаги реализации',
+                  advantages: 'Преимущества',
+                  bestSellers: 'Хиты продаж',
+                  consultation: 'Форма консультации',
+                  reviews: 'Отзывы',
+                }
+                
+                return (
+                  <motion.div
+                    key={block.id}
+                    className="flex items-center gap-4 p-4 bg-black/30 rounded-lg border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all"
+                  >
+                    <GripVertical size={20} className="text-gray-500 cursor-move" />
+                    <div className="flex-1">
+                      <div className="text-white font-medium">{blockNames[block.type] || block.type}</div>
+                      <div className="text-xs text-gray-400">Порядок: {block.order + 1}</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        toggleBlock(block.id, !block.enabled)
+                        addToast(`${blockNames[block.type]} ${block.enabled ? 'скрыт' : 'показан'}`, 'info')
+                      }}
+                      className={`p-2 rounded-lg transition-colors ${
+                        block.enabled
+                          ? 'text-green-400 hover:bg-green-400/20'
+                          : 'text-gray-500 hover:bg-gray-500/20'
+                      }`}
+                    >
+                      {block.enabled ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </button>
+                  </motion.div>
+                )
+              })}
+            </div>
+            
+            <div className="mt-6 p-4 bg-black/30 rounded-lg border border-neon-cyan/20">
+              <p className="text-sm text-gray-400">
+                💡 Порядок блоков обновляется автоматически. Включенные блоки отображаются на главной странице.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Advantages Editor */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glassmorphism-light rounded-xl p-6 border border-neon-cyan/20"
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">Преимущества</h2>
+            <div className="space-y-4">
+              {advantages.map((advantage, index) => (
+                <div key={advantage.id} className="p-4 bg-black/30 rounded-lg border border-neon-cyan/20">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Название иконки (Lucide)</label>
+                      <input
+                        type="text"
+                        value={advantage.icon}
+                        onChange={(e) => {
+                          const newAdvantages = [...advantages]
+                          newAdvantages[index] = { ...advantage, icon: e.target.value }
+                          updateAdvantages(newAdvantages)
+                        }}
+                        className="w-full px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                        placeholder="Zap"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Заголовок</label>
+                      <input
+                        type="text"
+                        value={advantage.title}
+                        onChange={(e) => {
+                          const newAdvantages = [...advantages]
+                          newAdvantages[index] = { ...advantage, title: e.target.value }
+                          updateAdvantages(newAdvantages)
+                        }}
+                        className="w-full px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-2">Описание</label>
+                      <input
+                        type="text"
+                        value={advantage.description}
+                        onChange={(e) => {
+                          const newAdvantages = [...advantages]
+                          newAdvantages[index] = { ...advantage, description: e.target.value }
+                          updateAdvantages(newAdvantages)
+                        }}
+                        className="w-full px-4 py-2 bg-black/50 border border-neon-cyan/30 rounded-lg text-white text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={() => addToast('Преимущества обновлены', 'success')}
                 className="px-6 py-3 bg-gradient-hero text-deep-dark font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all flex items-center gap-2"
               >
                 <Save size={20} />

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X, Phone } from 'lucide-react'
+import { Menu, X, Phone, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCartStore } from '@/store/cartStore'
 
 const menuItems = [
   { name: 'Главная', href: '/' },
@@ -18,6 +19,7 @@ const menuItems = [
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const totalItems = useCartStore((state) => state.getTotalItems())
 
   return (
     <motion.header
@@ -49,6 +51,24 @@ export default function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Cart Icon */}
+            <Link
+              href="/cart"
+              className="relative p-2 text-gray-300 hover:text-neon-cyan transition-colors"
+              aria-label="Корзина"
+            >
+              <ShoppingCart size={22} />
+              {totalItems > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 bg-neon-cyan text-deep-dark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center min-w-[20px]"
+                >
+                  {totalItems > 99 ? '99+' : totalItems}
+                </motion.span>
+              )}
+            </Link>
+
             {/* Phone Number - Desktop */}
             <a
               href="tel:+79991234567"
