@@ -140,7 +140,7 @@ export interface PageCustomData {
   partners?: {
     heroTitle: string
     heroSubtitle: string
-    benefits: Array<{ id: string; title: string; description: string }>
+    benefits: Array<{ id: string; title: string; description: string; icon?: string }>
     requirements: Array<{ id: string; text: string }>
   }
   promotions?: {
@@ -389,9 +389,9 @@ const initialPageCustomData: PageCustomData = {
     heroTitle: 'Партнёрам',
     heroSubtitle: 'Станьте нашим партнером и получите выгодные условия сотрудничества.',
     benefits: [
-      { id: '1', title: 'Выгодные цены', description: 'Специальные оптовые цены для партнеров' },
-      { id: '2', title: 'Маркетинговая поддержка', description: 'Готовые материалы для продвижения' },
-      { id: '3', title: 'Обучение персонала', description: 'Программы обучения для вашей команды' },
+      { id: '1', title: 'Выгодные цены', description: 'Специальные оптовые цены для партнеров', icon: 'TrendingUp' },
+      { id: '2', title: 'Маркетинговая поддержка', description: 'Готовые материалы для продвижения', icon: 'Users' },
+      { id: '3', title: 'Обучение персонала', description: 'Программы обучения для вашей команды', icon: 'Award' },
     ],
     requirements: [
       { id: '1', text: 'Опыт работы в строительной отрасли' },

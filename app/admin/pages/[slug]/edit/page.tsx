@@ -563,7 +563,14 @@ export default function PageEditor() {
                       <Trash2 size={16} />
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <input
+                      type="text"
+                      value={item.icon || ''}
+                      onChange={(e) => updateArrayItem('benefits', index, { icon: e.target.value })}
+                      className="px-3 py-2 bg-black/50 border border-neon-cyan/30 rounded text-white text-sm"
+                      placeholder="Иконка (Lucide)"
+                    />
                     <input
                       type="text"
                       value={item.title || ''}
@@ -582,7 +589,7 @@ export default function PageEditor() {
                 </div>
               ))}
               <button
-                onClick={() => addArrayItem('benefits', { title: '', description: '' })}
+                onClick={() => addArrayItem('benefits', { title: '', description: '', icon: 'TrendingUp' })}
                 className="flex items-center gap-2 px-4 py-2 bg-neon-cyan/20 text-neon-cyan rounded-lg hover:bg-neon-cyan/30 transition-colors"
               >
                 <Plus size={16} />
