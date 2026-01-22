@@ -949,6 +949,22 @@ export default function ContentPage() {
                   </p>
                 </div>
               </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
+                  <Phone size={16} />
+                  Номер телефона (отображается в шапке сайта)
+                </label>
+                <input
+                  type="tel"
+                  value={designSettings.phoneNumber || ''}
+                  onChange={(e) => updateDesignSettings({ phoneNumber: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
+                  placeholder="+7 (999) 123-45-67"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Номер будет отображаться в шапке сайта рядом с иконкой телефона
+                </p>
+              </div>
               <button
                 onClick={() => {
                   addToast('Настройки дизайна сохранены', 'success')

@@ -7,6 +7,7 @@ export interface DesignSettings {
   textColor: string
   logoImage: string // URL или base64
   logoText: string
+  phoneNumber: string // Номер телефона для шапки
 }
 
 interface SettingsStore {
@@ -20,6 +21,7 @@ const initialDesignSettings: DesignSettings = {
   textColor: '#ffffff',
   logoImage: '/logo.svg', // Дефолтный логотип
   logoText: 'Капсульные дома',
+  phoneNumber: '+7 (999) 123-45-67', // Дефолтный номер телефона
 }
 
 export const useSettingsStore = create<SettingsStore>()(

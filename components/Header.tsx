@@ -11,7 +11,6 @@ const menuItems = [
   { name: 'Главная', href: '/' },
   { name: 'О продукте', href: '/about' },
   { name: 'Каталог', href: '/catalog' },
-  { name: 'Каталоги', href: '/catalogs' },
   { name: 'Комплектация', href: '/equipment' },
   { name: 'Оплата и доставка', href: '/payment' },
   { name: 'Акции', href: '/promotions' },
@@ -32,15 +31,15 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-50 glassmorphism"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-20 sm:h-24">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 -ml-2 lg:-ml-4" suppressHydrationWarning>
             {designSettings.logoImage && designSettings.logoImage.trim() !== '' && (designSettings.logoImage.startsWith('data:') || designSettings.logoImage.startsWith('http') || designSettings.logoImage.startsWith('/')) ? (
-              <div className="relative h-10 w-auto flex items-center">
+              <div className="relative h-16 w-auto flex items-center sm:h-20">
                 <img 
                   src={designSettings.logoImage} 
                   alt={designSettings.logoText || 'Капсульные дома'} 
-                  className="h-10 w-auto object-contain"
+                  className="h-16 w-auto object-contain sm:h-20"
                   onError={(e) => {
                     // Fallback to text if image fails to load
                     const target = e.target as HTMLImageElement
@@ -48,7 +47,7 @@ export default function Header() {
                     const parent = target.parentElement
                     if (parent && !parent.querySelector('.logo-text-fallback')) {
                       const fallback = document.createElement('div')
-                      fallback.className = 'text-2xl font-bold text-gradient logo-text-fallback'
+                      fallback.className = 'text-3xl sm:text-4xl font-bold text-gradient logo-text-fallback'
                       fallback.textContent = designSettings.logoText || 'Капсульные дома'
                       parent.appendChild(fallback)
                     }
@@ -57,8 +56,8 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-gradient" suppressHydrationWarning>{designSettings.logoText || 'Капсульные дома'}</div>
-                <div className="hidden sm:block text-sm text-gray-400">Инновации</div>
+                <div className="text-3xl sm:text-4xl font-bold text-gradient" suppressHydrationWarning>{designSettings.logoText || 'Капсульные дома'}</div>
+                <div className="hidden sm:block text-base text-gray-400">Инновации</div>
               </>
             )}
           </Link>
@@ -97,13 +96,15 @@ export default function Header() {
             </Link>
 
             {/* Phone Number - Desktop */}
-            <a
-              href="tel:+79991234567"
-              className="hidden lg:flex items-center space-x-2 text-gray-300 hover:text-neon-cyan transition-colors"
-            >
-              <Phone size={18} />
-              <span className="text-sm">+7 (999) 123-45-67</span>
-            </a>
+            {designSettings.phoneNumber && (
+              <a
+                href={`tel:${designSettings.phoneNumber.replace(/\s|\(|\)|-/g, '')}`}
+                className="hidden lg:flex items-center space-x-2 text-gray-300 hover:text-neon-cyan transition-colors"
+              >
+                <Phone size={18} />
+                <span className="text-sm">{designSettings.phoneNumber}</span>
+              </a>
+            )}
 
             {/* Callback Button - Desktop */}
             <Link

@@ -1,9 +1,12 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- #?@>I5==0O 25@A8O ;>3>B8?0 4;O favicon - B>;L:> AB8;87>20==0O "m" -->
-  <!-- $>= 4;O ;CGH59 2848<>AB8 -->
-  <rect width="32" height="32" rx="6" fill="#0a0a0a"/>
-  <!-- Left vertical line of "m" -->
-  <path d="M6 12 Q6 8 8 6 Q10 8 10 12" stroke="#00f2ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-  <!-- Right vertical line of "m" -->
-  <path d="M14 12 Q14 8 16 6 Q18 8 18 12" stroke="#00f2ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Увеличенная версия логотипа для favicon - более заметная -->
+  <!-- Фон для лучшей видимости -->
+  <rect width="64" height="64" rx="12" fill="#0a0a0a"/>
+  <!-- Left vertical line of "m" - увеличенная и более яркая -->
+  <path d="M12 24 Q12 16 16 12 Q20 16 20 24" stroke="#00f2ff" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Right vertical line of "m" - увеличенная и более яркая -->
+  <path d="M28 24 Q28 16 32 12 Q36 16 36 24" stroke="#00f2ff" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Дополнительная подсветка для лучшей видимости -->
+  <path d="M12 24 Q12 16 16 12 Q20 16 20 24" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M28 24 Q28 16 32 12 Q36 16 36 24" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
 </svg>
