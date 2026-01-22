@@ -13,18 +13,26 @@ import QuickOrderModal from '@/components/modals/QuickOrderModal'
 export default function BestSellers() {
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
   const [isMounted, setIsMounted] = useState(false)
-  
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
   const [quickViewProduct, setQuickViewProduct] = useState<ReturnType<typeof useProductsStore.getState>['products'][0] | null>(null)
   const [quickOrderProduct, setQuickOrderProduct] = useState<ReturnType<typeof useProductsStore.getState>['products'][0] | null>(null)
   const products = useProductsStore((state) => state.getProducts())
   const addItem = useCartStore((state) => state.addItem)
   const addToast = useToastStore((state) => state.addToast)
   
+  useEffect(() => {
+    // #region agent log
+    const productsCount = products.length;
+    fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BestSellers.tsx:17',message:'Component mounted',data:{productsCount},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    setIsMounted(true)
+  }, [])
+  
   // Берем первые 6 товаров как хиты продаж
-  const bestSellers = products.slice(0, 6)
+  const bestSellers = isMounted ? products.slice(0, 6) : []
+
+  if (!isMounted) {
+    return null
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -41,7 +49,7 @@ export default function BestSellers() {
       price: product.price,
       dimensions: product.dimensions,
       guests: product.guests,
-      image: product.images[0] || undefined,
+      image: (product.images && product.images.length > 0) ? product.images[0] : undefined,
     })
     addToast(`${product.name} добавлен в корзину`, 'success')
   }
@@ -57,7 +65,7 @@ export default function BestSellers() {
       price: product.price,
       dimensions: product.dimensions,
       guests: product.guests,
-      image: product.images[0] || undefined,
+      image: (product.images && product.images.length > 0) ? product.images[0] : undefined,
     })
     addToast(`${product.name} добавлен в корзину`, 'success')
   }
@@ -85,8 +93,10 @@ export default function BestSellers() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {bestSellers.map((product, index) => {
             const isHovered = hoveredProduct === product.id
-            const currentImageIndex = isHovered && product.images.length > 1 ? 1 : 0
-            const imageUrl = product.images[currentImageIndex]
+            const currentImageIndex = isHovered && product.images && product.images.length > 1 ? 1 : 0
+            const imageUrl = product.images && product.images.length > 0 && currentImageIndex < product.images.length 
+              ? product.images[currentImageIndex] 
+              : undefined
 
             return (
               <motion.div
@@ -104,16 +114,17 @@ export default function BestSellers() {
                 className="group relative"
               >
                 <div className="glassmorphism-light rounded-2xl overflow-hidden border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all duration-300 h-full flex flex-col">
-                  {/* Image Container */}
+                  {/* Image/Video Container */}
                   <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-deep-dark to-black">
+                    {/* Default Image */}
                     {isMounted && imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http')) ? (
                       <img
                         src={imageUrl}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:opacity-0 transition-opacity duration-300"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity duration-300">
                         <div className="text-center space-y-2">
                           <div className="w-24 h-24 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
                             <span className="text-4xl">🏠</span>
@@ -122,6 +133,76 @@ export default function BestSellers() {
                         </div>
                       </div>
                     )}
+                    
+                    {/* Video on Hover */}
+                    {product.video && product.video.trim() && (() => {
+                      let videoSrc: string = '';
+                      let videoId: string | undefined;
+                      const isYouTube = product.video.includes('youtube.com') || product.video.includes('youtu.be');
+                      const isVimeo = product.video.includes('vimeo.com');
+                      
+                      // #region agent log
+                      try {
+                        if (isYouTube) {
+                          if (product.video.includes('youtube.com/watch')) {
+                            videoSrc = product.video.replace('watch?v=', 'embed/').split('&')[0];
+                          } else {
+                            videoId = product.video.split('/').pop()?.split('?')[0];
+                            videoSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+                          }
+                          if (videoSrc) videoSrc += '?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1';
+                        } else if (isVimeo) {
+                          videoId = product.video.split('/').pop()?.split('?')[0];
+                          videoSrc = videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&controls=0` : '';
+                        } else {
+                          videoSrc = product.video;
+                        }
+                        
+                        fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BestSellers.tsx:132',message:'Video URL parsing',data:{productId:product.id,originalUrl:product.video,videoId,videoSrc,isValid:!!videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+                      } catch (e) {
+                        fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BestSellers.tsx:132',message:'Video URL parsing error',data:{productId:product.id,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+                      }
+                      // #endregion
+                      
+                      if (!videoSrc) return null;
+                      
+                      return (
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          {isYouTube && videoSrc ? (
+                            <iframe
+                              src={videoSrc}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : isVimeo && videoSrc ? (
+                            <iframe
+                              src={videoSrc}
+                              className="w-full h-full"
+                              allow="autoplay; fullscreen; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : videoSrc ? (
+                            <video
+                              src={videoSrc}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
+                              autoPlay
+                              loop
+                              onError={(e) => {
+                                // #region agent log
+                                fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BestSellers.tsx:video-error',message:'Video load error',data:{productId:product.id,videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'E'})}).catch(()=>{});
+                                // #endregion
+                              }}
+                            />
+                          ) : null}
+                          <div className="absolute top-2 right-2 px-2 py-1 bg-black/70 rounded text-xs text-white">
+                            ▶ Видео
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {/* Image Transition Overlay */}
                     <motion.div

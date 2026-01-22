@@ -67,8 +67,9 @@ export default function ProductsPage() {
       dimensions: '0×0×0 м',
       guests: 2,
       description: '',
-      category: 'standard',
+      category: 'two-story',
       images: [],
+      video: undefined,
       inStock: true,
     }
     setEditingProduct(newProduct)
@@ -249,13 +250,13 @@ export default function ProductsPage() {
                   }
                   className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
                 >
-                  <option value="mini">Мини</option>
-                  <option value="standard">Стандарт</option>
-                  <option value="premium">Премиум</option>
-                  <option value="luxe">Люкс</option>
-                  <option value="studio">Студия</option>
-                  <option value="office">Офис</option>
-                  <option value="complex">Модульные комплексы</option>
+                  <option value="two-story">Двухэтажные капсульные дома</option>
+                  <option value="sliding">Раздвижные капсульные дома</option>
+                  <option value="vertical">Вертикальные</option>
+                  <option value="mini">Мини капсульные дома</option>
+                  <option value="designer">Дизайнерские капсульные дома</option>
+                  <option value="new-section-1">Новый раздел</option>
+                  <option value="new-section-2">Новый раздел</option>
                 </select>
               </div>
 
@@ -272,7 +273,52 @@ export default function ProductsPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Фотографии и видео</label>
+                <label className="block text-sm text-gray-400 mb-2">Видео (YouTube, Vimeo или прямой URL)</label>
+                <input
+                  type="text"
+                  value={editingProduct.video || ''}
+                  onChange={(e) =>
+                    setEditingProduct({ ...editingProduct, video: e.target.value })
+                  }
+                  placeholder="https://youtube.com/watch?v=... или https://vimeo.com/... или прямой URL"
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-neon-cyan transition-colors mb-4"
+                />
+                {editingProduct.video && (
+                  <div className="mb-4 p-2 bg-black/30 rounded-lg border border-neon-cyan/20">
+                    <p className="text-xs text-gray-400 mb-2">Предпросмотр:</p>
+                    {editingProduct.video.includes('youtube.com') || editingProduct.video.includes('youtu.be') ? (
+                      <div className="aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={editingProduct.video.includes('youtube.com/watch') 
+                            ? editingProduct.video.replace('watch?v=', 'embed/')
+                            : editingProduct.video.replace('youtu.be/', 'youtube.com/embed/')}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : editingProduct.video.includes('vimeo.com') ? (
+                      <div className="aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={`https://player.vimeo.com/video/${editingProduct.video.split('/').pop()}`}
+                          className="w-full h-full"
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : (
+                      <video
+                        src={editingProduct.video}
+                        controls
+                        className="w-full h-48 rounded-lg"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Фотографии</label>
                 <div className="space-y-4">
                   {/* Media URLs */}
                   {editingProduct.images.map((image, index) => (

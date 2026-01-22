@@ -18,8 +18,8 @@ const initialDesignSettings: DesignSettings = {
   primaryColor: '#00f2ff', // neon-cyan
   secondaryColor: '#000814', // deep-dark
   textColor: '#ffffff',
-  logoImage: '',
-  logoText: 'CAPSULE',
+  logoImage: '/logo.svg', // Дефолтный логотип
+  logoText: 'Капсульные дома',
 }
 
 export const useSettingsStore = create<SettingsStore>()(

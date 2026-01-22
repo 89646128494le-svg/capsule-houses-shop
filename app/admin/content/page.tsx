@@ -891,15 +891,29 @@ export default function ContentPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Логотип (URL или загрузите файл)</label>
+                <label className="block text-sm text-gray-400 mb-2">Текст логотипа</label>
+                <input
+                  type="text"
+                  value={designSettings.logoText}
+                  onChange={(e) => updateDesignSettings({ logoText: e.target.value })}
+                  className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors mb-4"
+                  placeholder="Капсульные дома"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Изображение логотипа (URL или загрузите файл)</label>
                 <div className="space-y-4">
                   {designSettings.logoImage && (
-                    <div className="w-32 h-32 rounded-lg overflow-hidden border border-neon-cyan/30">
-                      <img
-                        src={designSettings.logoImage}
-                        alt="Logo"
-                        className="w-full h-full object-contain"
-                      />
+                    <div className="w-32 h-32 rounded-lg overflow-hidden border border-neon-cyan/30 bg-black/30 flex items-center justify-center">
+                      {(designSettings.logoImage.startsWith('data:') || designSettings.logoImage.startsWith('http') || designSettings.logoImage.startsWith('/')) ? (
+                        <img
+                          src={designSettings.logoImage}
+                          alt="Logo"
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <span className="text-gray-500 text-sm">Предпросмотр</span>
+                      )}
                     </div>
                   )}
                   <input
@@ -907,7 +921,7 @@ export default function ContentPage() {
                     value={designSettings.logoImage}
                     onChange={(e) => updateDesignSettings({ logoImage: e.target.value })}
                     className="w-full px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-white focus:outline-none focus:border-neon-cyan transition-colors"
-                    placeholder="URL логотипа"
+                    placeholder="URL логотипа (например: /logo.svg)"
                   />
                   <label className="flex items-center justify-center gap-2 px-4 py-3 bg-black/50 border border-neon-cyan/30 rounded-lg text-gray-300 hover:border-neon-cyan hover:text-neon-cyan transition-all cursor-pointer">
                     <Image size={18} />
@@ -923,12 +937,16 @@ export default function ContentPage() {
                           reader.onload = (event) => {
                             const result = event.target?.result as string
                             updateDesignSettings({ logoImage: result })
+                            addToast('Логотип загружен', 'success')
                           }
                           reader.readAsDataURL(file)
                         }
                       }}
                     />
                   </label>
+                  <p className="text-xs text-gray-500">
+                    Поддерживаются форматы: SVG, PNG, JPG. Рекомендуемый размер: 120×40px
+                  </p>
                 </div>
               </div>
               <button

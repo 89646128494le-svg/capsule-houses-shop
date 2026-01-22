@@ -1,0 +1,13 @@
+<svg width="200" height="100" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stylized "m" graphic - two parallel curved vertical lines with rounded caps at top -->
+  <!-- Left vertical line of "m" -->
+  <path d="M15 35 Q15 20 20 15 Q25 20 25 35" stroke="#00f2ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Right vertical line of "m" -->
+  <path d="M35 35 Q35 20 40 15 Q45 20 45 35" stroke="#00f2ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+  
+  <!-- "modus tech" text -->
+  <text x="15" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="300" fill="#00f2ff" letter-spacing="2px">modus tech</text>
+  
+  <!-- "Capsule houses" tagline -->
+  <text x="15" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="300" fill="#999999" letter-spacing="1.2px">Capsule houses</text>
+</svg>

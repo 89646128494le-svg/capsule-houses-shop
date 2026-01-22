@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Filter, X, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
@@ -8,13 +8,13 @@ import { useProductsStore } from '@/store/productsStore'
 
 const categories = [
   { value: 'all', label: 'Все категории' },
-  { value: 'mini', label: 'Мини (2 гостя)' },
-  { value: 'standard', label: 'Стандарт (4 гостя)' },
-  { value: 'premium', label: 'Премиум (6 гостей)' },
-  { value: 'luxe', label: 'Люкс (8+ гостей)' },
-  { value: 'studio', label: 'Студия' },
-  { value: 'office', label: 'Офис' },
-  { value: 'complex', label: 'Модульные комплексы' },
+  { value: 'two-story', label: 'Двухэтажные капсульные дома' },
+  { value: 'sliding', label: 'Раздвижные капсульные дома' },
+  { value: 'vertical', label: 'Вертикальные' },
+  { value: 'mini', label: 'Мини капсульные дома' },
+  { value: 'designer', label: 'Дизайнерские капсульные дома' },
+  { value: 'new-section-1', label: 'Новый раздел' },
+  { value: 'new-section-2', label: 'Новый раздел' },
 ]
 
 const sortOptions = [
@@ -33,6 +33,7 @@ const priceRanges = [
 ]
 
 export default function CatalogGrid() {
+  const [isMounted, setIsMounted] = useState(false)
   const products = useProductsStore((state) => state.getProducts())
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedPriceRange, setSelectedPriceRange] = useState<number | null>(null)
@@ -41,6 +42,14 @@ export default function CatalogGrid() {
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 12
+
+  useEffect(() => {
+    // #region agent log
+    const productsCount = products.length;
+    fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:46',message:'Component mounted',data:{productsCount},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    setIsMounted(true)
+  }, [])
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products]
@@ -51,9 +60,11 @@ export default function CatalogGrid() {
     }
 
     // Фильтр по цене
-    if (selectedPriceRange !== null) {
+    if (selectedPriceRange !== null && selectedPriceRange >= 0 && selectedPriceRange < priceRanges.length) {
       const range = priceRanges[selectedPriceRange]
-      filtered = filtered.filter((p) => p.price >= range.min && p.price <= range.max)
+      if (range) {
+        filtered = filtered.filter((p) => p.price >= range.min && p.price <= range.max)
+      }
     }
 
     // Фильтр по количеству гостей
@@ -80,11 +91,11 @@ export default function CatalogGrid() {
     return filtered
   }, [products, selectedCategory, selectedPriceRange, selectedGuests, sortBy])
 
-  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage)
-  const paginatedProducts = filteredAndSortedProducts.slice(
+  const totalPages = itemsPerPage > 0 ? Math.ceil(filteredAndSortedProducts.length / itemsPerPage) : 1
+  const paginatedProducts = isMounted && itemsPerPage > 0 ? filteredAndSortedProducts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  )
+  ) : []
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -267,7 +278,11 @@ export default function CatalogGrid() {
 
           {/* Products Grid */}
           <div className="flex-1">
-            {paginatedProducts.length > 0 ? (
+            {!isMounted ? (
+              <div className="text-center py-12 text-gray-400">
+                <p>Загрузка...</p>
+              </div>
+            ) : paginatedProducts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-8">
                   {paginatedProducts.map((product, index) => (
@@ -280,17 +295,18 @@ export default function CatalogGrid() {
                       className="group"
                     >
                       <Link href={`/product/${product.id}`}>
-                        <div className="glassmorphism-light rounded-2xl overflow-hidden border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all duration-300 h-full flex flex-col">
-                          {/* Image */}
+                        <div className="glassmorphism-light rounded-2xl overflow-hidden border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all duration-300 h-full flex flex-col group">
+                          {/* Image/Video */}
                           <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-deep-dark to-black">
-                            {product.images[0] && (product.images[0].startsWith('data:') || product.images[0].startsWith('http')) ? (
+                            {/* Default Image */}
+                            {product.images && product.images.length > 0 && product.images[0] && (product.images[0].startsWith('data:') || product.images[0].startsWith('http')) ? (
                               <img
                                 src={product.images[0]}
                                 alt={product.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover group-hover:opacity-0 transition-opacity duration-300"
                               />
                             ) : (
-                              <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity duration-300">
                                 <div className="text-center space-y-2">
                                   <div className="w-24 h-24 mx-auto border-2 border-dashed border-neon-cyan/30 rounded-lg flex items-center justify-center">
                                     <span className="text-4xl">🏠</span>
@@ -299,8 +315,79 @@ export default function CatalogGrid() {
                                 </div>
                               </div>
                             )}
+                            
+                            {/* Video on Hover */}
+                            {product.video && product.video.trim() && (() => {
+                              let videoSrc: string = '';
+                              let videoId: string | undefined;
+                              const isYouTube = product.video.includes('youtube.com') || product.video.includes('youtu.be');
+                              const isVimeo = product.video.includes('vimeo.com');
+                              
+                              // #region agent log
+                              try {
+                                if (isYouTube) {
+                                  if (product.video.includes('youtube.com/watch')) {
+                                    videoSrc = product.video.replace('watch?v=', 'embed/').split('&')[0];
+                                  } else {
+                                    videoId = product.video.split('/').pop()?.split('?')[0];
+                                    videoSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+                                  }
+                                  if (videoSrc) videoSrc += '?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1';
+                                } else if (isVimeo) {
+                                  videoId = product.video.split('/').pop()?.split('?')[0];
+                                  videoSrc = videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&controls=0` : '';
+                                } else {
+                                  videoSrc = product.video;
+                                }
+                                
+                                fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:314',message:'Video URL parsing',data:{productId:product.id,originalUrl:product.video,videoId,videoSrc,isValid:!!videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+                              } catch (e) {
+                                fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:314',message:'Video URL parsing error',data:{productId:product.id,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+                              }
+                              // #endregion
+                              
+                              if (!videoSrc) return null;
+                              
+                              return (
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  {isYouTube && videoSrc ? (
+                                    <iframe
+                                      src={videoSrc}
+                                      className="w-full h-full"
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                    />
+                                  ) : isVimeo && videoSrc ? (
+                                    <iframe
+                                      src={videoSrc}
+                                      className="w-full h-full"
+                                      allow="autoplay; fullscreen; picture-in-picture"
+                                      allowFullScreen
+                                    />
+                                  ) : videoSrc ? (
+                                    <video
+                                      src={videoSrc}
+                                      className="w-full h-full object-cover"
+                                      muted
+                                      playsInline
+                                      autoPlay
+                                      loop
+                                      onError={(e) => {
+                                        // #region agent log
+                                        fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:video-error',message:'Video load error',data:{productId:product.id,videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'E'})}).catch(()=>{});
+                                        // #endregion
+                                      }}
+                                    />
+                                  ) : null}
+                                  <div className="absolute top-2 right-2 px-2 py-1 bg-black/70 rounded text-xs text-white">
+                                    ▶ Видео
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                            
                             {!product.inStock && (
-                              <div className="absolute top-4 left-4 px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full text-xs font-medium">
+                              <div className="absolute top-4 left-4 px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full text-xs font-medium z-10">
                                 Нет в наличии
                               </div>
                             )}

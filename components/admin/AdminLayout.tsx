@@ -23,6 +23,7 @@ const menuItems = [
   { name: 'Заказы', href: '/admin/orders', icon: ShoppingBag },
   { name: 'Страницы', href: '/admin/pages', icon: FileText },
   { name: 'Контент', href: '/admin/content', icon: FileText },
+  { name: 'Каталоги PDF', href: '/admin/catalogs', icon: FileText },
   { name: 'Отправить письмо', href: '/admin/test-email', icon: Mail },
   { name: 'Аналитика', href: '/admin/analytics', icon: BarChart3 },
 ]

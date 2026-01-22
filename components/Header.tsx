@@ -5,11 +5,13 @@ import { Menu, X, Phone, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCartStore } from '@/store/cartStore'
+import { useSettingsStore } from '@/store/settingsStore'
 
 const menuItems = [
   { name: 'Главная', href: '/' },
   { name: 'О продукте', href: '/about' },
   { name: 'Каталог', href: '/catalog' },
+  { name: 'Каталоги', href: '/catalogs' },
   { name: 'Комплектация', href: '/equipment' },
   { name: 'Оплата и доставка', href: '/payment' },
   { name: 'Акции', href: '/promotions' },
@@ -20,6 +22,7 @@ const menuItems = [
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const totalItems = useCartStore((state) => state.getTotalItems())
+  const designSettings = useSettingsStore((state) => state.designSettings)
 
   return (
     <motion.header
@@ -31,9 +34,33 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 -ml-2 lg:-ml-4">
-            <div className="text-2xl font-bold text-gradient">CAPSULE</div>
-            <div className="hidden sm:block text-sm text-gray-400">HOUSES</div>
+          <Link href="/" className="flex items-center space-x-2 -ml-2 lg:-ml-4" suppressHydrationWarning>
+            {designSettings.logoImage && designSettings.logoImage.trim() !== '' && (designSettings.logoImage.startsWith('data:') || designSettings.logoImage.startsWith('http') || designSettings.logoImage.startsWith('/')) ? (
+              <div className="relative h-10 w-auto flex items-center">
+                <img 
+                  src={designSettings.logoImage} 
+                  alt={designSettings.logoText || 'Капсульные дома'} 
+                  className="h-10 w-auto object-contain"
+                  onError={(e) => {
+                    // Fallback to text if image fails to load
+                    const target = e.target as HTMLImageElement
+                    target.style.display = 'none'
+                    const parent = target.parentElement
+                    if (parent && !parent.querySelector('.logo-text-fallback')) {
+                      const fallback = document.createElement('div')
+                      fallback.className = 'text-2xl font-bold text-gradient logo-text-fallback'
+                      fallback.textContent = designSettings.logoText || 'Капсульные дома'
+                      parent.appendChild(fallback)
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-gradient" suppressHydrationWarning>{designSettings.logoText || 'Капсульные дома'}</div>
+                <div className="hidden sm:block text-sm text-gray-400">Инновации</div>
+              </>
+            )}
           </Link>
 
           {/* Desktop Navigation */}
