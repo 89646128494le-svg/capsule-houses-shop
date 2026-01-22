@@ -12,6 +12,16 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Капсульные дома | Инновационные решения для жизни',
   description: 'Современные капсульные дома с технологичным дизайном. Быстрая сборка, высокое качество, уникальные решения.',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/logo.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+  },
 }
 
 export default function RootLayout({

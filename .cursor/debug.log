@@ -1,0 +1,10 @@
+{"location":"productsStore.ts:77","message":"Store initialization","data":{"hasStored":true,"productsCount":30},"timestamp":1769095727991,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"BestSellers.tsx:17","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095728103,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"BestSellers.tsx:17","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095728110,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"CatalogGrid.tsx:46","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095745201,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"CatalogGrid.tsx:46","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095745201,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"BestSellers.tsx:17","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095750040,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"BestSellers.tsx:17","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095750040,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"CatalogGrid.tsx:46","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095751338,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"CatalogGrid.tsx:46","message":"Component mounted","data":{"productsCount":30},"timestamp":1769095751338,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"productsStore.ts:77","message":"Store initialization","data":{"hasStored":true,"productsCount":30},"timestamp":1769095779864,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}

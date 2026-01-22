@@ -236,5 +236,77 @@ export async function sendOrderStatusEmail(data: OrderStatusEmailData & { custom
   })
 }
 
+/**
+ * Отправка произвольного email
+ */
+export async function sendCustomEmail(data: {
+  to: string
+  subject: string
+  message: string
+  customerName?: string
+}): Promise<boolean> {
+  if (!data.to || !data.subject || !data.message) return false
+
+  const htmlMessage = `
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1a1a1a; background-color: #f5f5f5; }
+    .email-wrapper { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background: linear-gradient(135deg, #00f2ff 0%, #00b8cc 100%); padding: 40px 30px; text-align: center; }
+    .header h1 { color: #ffffff; font-size: 28px; font-weight: 700; }
+    .content { padding: 40px 30px; }
+    .message-box { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); padding: 25px; border-radius: 8px; border-left: 4px solid #00f2ff; }
+    .message-text { color: #333; line-height: 1.8; white-space: pre-wrap; }
+    .footer { background-color: #1a1a1a; color: #ffffff; padding: 30px; text-align: center; }
+    .footer-text { font-size: 14px; opacity: 0.8; }
+    @media only screen and (max-width: 600px) {
+      .content { padding: 30px 20px; }
+      .header { padding: 30px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="header">
+      <h1>${escapeHtml(data.subject)}</h1>
+    </div>
+    <div class="content">
+      ${data.customerName ? `<p>Здравствуйте, ${escapeHtml(data.customerName)}!</p>` : ''}
+      <div class="message-box">
+        <div class="message-text">${escapeHtml(data.message).replace(/\n/g, '<br>')}</div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-text">Capsule Houses</div>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim()
+
+  return await sendEmail({
+    to: data.to,
+    subject: data.subject,
+    body: data.message,
+    html: htmlMessage,
+  })
+}
+
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }
+  return text.replace(/[&<>"']/g, (m) => map[m])
+}
+
 // Экспортируем функции форматирования для обратной совместимости
 export { formatOrderEmailAdmin as formatOrderEmail, formatCallbackEmail }
