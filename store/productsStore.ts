@@ -17,14 +17,14 @@ export interface Product {
 // 30 товаров для каталога
 const mockProducts: Product[] = [
   // Двухэтажные капсульные дома
-  { id: 1, name: 'Capsule Two-Story Basic', price: 1890000, dimensions: '4×3×5 м', guests: 4, description: 'Двухэтажный дом базовой комплектации', category: 'two-story', images: [], inStock: true },
-  { id: 2, name: 'Capsule Two-Story Premium', price: 2490000, dimensions: '5×4×6 м', guests: 6, description: 'Двухэтажный дом премиум класса', category: 'two-story', images: [], inStock: true },
-  { id: 3, name: 'Capsule Two-Story Luxe', price: 3190000, dimensions: '6×5×7 м', guests: 8, description: 'Роскошный двухэтажный дом', category: 'two-story', images: [], inStock: true },
+  { id: 1, name: 'Capsule Two-Story Basic', price: 1890000, dimensions: '4×3×5 м', guests: 4, description: 'Двухэтажный дом базовой комплектации', category: 'two-story', images: ['/bright-1.jpg', '/bright-2.jpg'], video: 'https://www.youtube.com/watch?v=ysz5S6PUM-U', inStock: true },
+  { id: 2, name: 'Capsule Two-Story Premium', price: 2490000, dimensions: '5×4×6 м', guests: 6, description: 'Двухэтажный дом премиум класса', category: 'two-story', images: ['/bright-2.jpg', '/hero-bg.jpg'], inStock: true },
+  { id: 3, name: 'Capsule Two-Story Luxe', price: 3190000, dimensions: '6×5×7 м', guests: 8, description: 'Роскошный двухэтажный дом', category: 'two-story', images: ['/hero-bg.jpg', '/bright-1.jpg'], inStock: true },
   
   // Раздвижные капсульные дома
-  { id: 4, name: 'Capsule Sliding Compact', price: 1290000, dimensions: '4×3×2.8 м', guests: 4, description: 'Компактный раздвижной дом', category: 'sliding', images: [], inStock: true },
-  { id: 5, name: 'Capsule Sliding Standard', price: 1590000, dimensions: '5×4×3 м', guests: 6, description: 'Стандартный раздвижной дом', category: 'sliding', images: [], inStock: true },
-  { id: 6, name: 'Capsule Sliding Pro', price: 1990000, dimensions: '6×4.5×3.5 м', guests: 8, description: 'Профессиональный раздвижной дом', category: 'sliding', images: [], inStock: true },
+  { id: 4, name: 'Capsule Sliding Compact', price: 1290000, dimensions: '4×3×2.8 м', guests: 4, description: 'Компактный раздвижной дом', category: 'sliding', images: ['/bright-1.jpg'], inStock: true },
+  { id: 5, name: 'Capsule Sliding Standard', price: 1590000, dimensions: '5×4×3 м', guests: 6, description: 'Стандартный раздвижной дом', category: 'sliding', images: ['/bright-2.jpg'], inStock: true },
+  { id: 6, name: 'Capsule Sliding Pro', price: 1990000, dimensions: '6×4.5×3.5 м', guests: 8, description: 'Профессиональный раздвижной дом', category: 'sliding', images: ['/hero-bg.jpg'], inStock: true },
   
   // Вертикальные
   { id: 7, name: 'Capsule Vertical Basic', price: 1490000, dimensions: '3×3×4.5 м', guests: 4, description: 'Вертикальный дом базовой комплектации', category: 'vertical', images: [], inStock: true },
@@ -78,17 +78,6 @@ interface ProductsStore {
 export const useProductsStore = create<ProductsStore>()(
   persist(
     (set, get) => {
-      // #region agent log
-      if (typeof window !== 'undefined') {
-        try {
-          const stored = localStorage.getItem('capsule-products-storage');
-          fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'productsStore.ts:77',message:'Store initialization',data:{hasStored:!!stored,productsCount:mockProducts.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        } catch (e) {
-          fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'productsStore.ts:77',message:'Store init error',data:{error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        }
-      }
-      // #endregion
-      
       return {
         products: mockProducts,
         
@@ -135,7 +124,7 @@ export const useProductsStore = create<ProductsStore>()(
       };
     },
     {
-      name: 'capsule-products-storage',
+      name: 'capsule-products-storage-v3',
       storage: createJSONStorage(() => localStorage),
     }
   )

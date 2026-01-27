@@ -20,7 +20,7 @@ const initialDesignSettings: DesignSettings = {
   secondaryColor: '#000814', // deep-dark
   textColor: '#ffffff',
   logoImage: '/logo.svg', // Дефолтный логотип
-  logoText: 'Капсульные дома',
+  logoText: 'Modus Tech',
   phoneNumber: '+7 (999) 123-45-67', // Дефолтный номер телефона
 }
 
@@ -36,7 +36,7 @@ export const useSettingsStore = create<SettingsStore>()(
       },
     }),
     {
-      name: 'capsule-settings-storage',
+      name: 'capsule-settings-storage-v2',
       storage: createJSONStorage(() => localStorage),
     }
   )

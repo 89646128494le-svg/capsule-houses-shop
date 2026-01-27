@@ -1,13 +1,15 @@
-<svg width="200" height="100" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Stylized "m" graphic - two parallel curved vertical lines with rounded caps at top -->
-  <!-- Left vertical line of "m" -->
-  <path d="M15 35 Q15 20 20 15 Q25 20 25 35" stroke="#00f2ff" stroke-width="2" stroke-linecap="round" fill="none"/>
-  <!-- Right vertical line of "m" -->
-  <path d="M35 35 Q35 20 40 15 Q45 20 45 35" stroke="#00f2ff" stroke-width="2" stroke-linecap="round" fill="none"/>
-  
-  <!-- "modus tech" text -->
-  <text x="15" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="300" fill="#00f2ff" letter-spacing="2px">modus tech</text>
-  
-  <!-- "Capsule houses" tagline -->
-  <text x="15" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="300" fill="#999999" letter-spacing="1.2px">Capsule houses</text>
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="glow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#00c2ff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#0094d4" stop-opacity="0.9" />
+    </linearGradient>
+  </defs>
+  <rect width="500" height="500" rx="32" fill="transparent" />
+  <!-- Stylised double arc "m" -->
+  <path d="M165 310 V190 C165 150 190 125 230 125 C270 125 295 150 295 190 V310" stroke="url(#glow)" stroke-width="18" stroke-linecap="round" fill="none" />
+  <path d="M295 310 V190 C295 150 320 125 360 125 C400 125 425 150 425 190 V310" stroke="url(#glow)" stroke-width="18" stroke-linecap="round" fill="none" />
+  <!-- Text -->
+  <text x="250" y="360" text-anchor="middle" font-family="'Segoe UI', 'Inter', sans-serif" font-size="64" font-weight="400" fill="#00a3d6" letter-spacing="2">modus tech</text>
+  <text x="250" y="405" text-anchor="middle" font-family="'Segoe UI', 'Inter', sans-serif" font-size="20" font-weight="300" fill="#5f7c8f" letter-spacing="1">????????????? ?????????? ?????</text>
 </svg>

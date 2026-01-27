@@ -1,12 +1,6 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Увеличенная версия логотипа для favicon - более заметная -->
-  <!-- Фон для лучшей видимости -->
-  <rect width="64" height="64" rx="12" fill="#0a0a0a"/>
-  <!-- Left vertical line of "m" - увеличенная и более яркая -->
-  <path d="M12 24 Q12 16 16 12 Q20 16 20 24" stroke="#00f2ff" stroke-width="3" stroke-linecap="round" fill="none"/>
-  <!-- Right vertical line of "m" - увеличенная и более яркая -->
-  <path d="M28 24 Q28 16 32 12 Q36 16 36 24" stroke="#00f2ff" stroke-width="3" stroke-linecap="round" fill="none"/>
-  <!-- Дополнительная подсветка для лучшей видимости -->
-  <path d="M12 24 Q12 16 16 12 Q20 16 20 24" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
-  <path d="M28 24 Q28 16 32 12 Q36 16 36 24" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="40" fill="#0b111a"/>
+  <path d="M76 182 V104 C76 78 94 60 120 60 C146 60 164 78 164 104 V182" stroke="#00c2ff" stroke-width="14" stroke-linecap="round" fill="none" />
+  <path d="M164 182 V104 C164 78 182 60 208 60 C234 60 252 78 252 104 V182" stroke="#00c2ff" stroke-width="14" stroke-linecap="round" fill="none" />
+  <text x="128" y="218" text-anchor="middle" font-family="'Segoe UI', 'Inter', sans-serif" font-size="34" font-weight="500" fill="#00c2ff">m</text>
 </svg>

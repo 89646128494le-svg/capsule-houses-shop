@@ -9,9 +9,16 @@ export default function Hero() {
   const heroContent = useContentStore((state) => state.heroContent)
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-deep-dark via-deep-dark to-black/50" />
-      
+      {/* Background Image + Gradient */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/bright-1.jpg" 
+          alt="Background" 
+          className="w-full h-full object-cover opacity-60" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-deep-dark/60 via-transparent to-deep-dark/80" />
+      </div>
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div

@@ -46,10 +46,6 @@ export default function CatalogGrid() {
   const itemsPerPage = 12
 
   useEffect(() => {
-    // #region agent log
-    const productsCount = products.length;
-    fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:46',message:'Component mounted',data:{productsCount},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     setIsMounted(true)
   }, [])
 
@@ -301,7 +297,7 @@ export default function CatalogGrid() {
                           {/* Image/Video */}
                           <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-deep-dark to-black">
                             {/* Default Image */}
-                            {product.images && product.images.length > 0 && product.images[0] && (product.images[0].startsWith('data:') || product.images[0].startsWith('http')) ? (
+                            {product.images && product.images.length > 0 && product.images[0] && (product.images[0].startsWith('data:') || product.images[0].startsWith('http') || product.images[0].startsWith('/')) ? (
                               <img
                                 src={product.images[0]}
                                 alt={product.name}
@@ -342,10 +338,9 @@ export default function CatalogGrid() {
                                   videoSrc = product.video;
                                 }
                                 
-                                fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:314',message:'Video URL parsing',data:{productId:product.id,originalUrl:product.video,videoId,videoSrc,isValid:!!videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-                              } catch (e) {
-                                fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:314',message:'Video URL parsing error',data:{productId:product.id,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
-                              }
+                      } catch (e) {
+                        console.error('Video URL parsing error', e);
+                      }
                               // #endregion
                               
                               if (!videoSrc) return null;
@@ -375,9 +370,7 @@ export default function CatalogGrid() {
                                       autoPlay
                                       loop
                                       onError={(e) => {
-                                        // #region agent log
-                                        fetch('http://127.0.0.1:7245/ingest/3763ec86-88e1-4fc2-93fb-708880a0a948',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CatalogGrid.tsx:video-error',message:'Video load error',data:{productId:product.id,videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'E'})}).catch(()=>{});
-                                        // #endregion
+                                console.error('Video load error', e);
                                       }}
                                     />
                                   ) : null}

@@ -35,11 +35,11 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 -ml-2 lg:-ml-4" suppressHydrationWarning>
             {designSettings.logoImage && designSettings.logoImage.trim() !== '' && (designSettings.logoImage.startsWith('data:') || designSettings.logoImage.startsWith('http') || designSettings.logoImage.startsWith('/')) ? (
-              <div className="relative h-16 w-auto flex items-center sm:h-20">
+              <div className="relative h-12 w-48 flex items-center sm:h-16 sm:w-64">
                 <img 
                   src={designSettings.logoImage} 
-                  alt={designSettings.logoText || 'Капсульные дома'} 
-                  className="h-16 w-auto object-contain sm:h-20"
+                  alt={designSettings.logoText || 'Лого'} 
+                  className="h-full w-full object-contain object-left"
                   onError={(e) => {
                     // Fallback to text if image fails to load
                     const target = e.target as HTMLImageElement

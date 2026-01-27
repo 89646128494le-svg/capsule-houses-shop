@@ -64,7 +64,7 @@ export default function CartContent() {
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Image */}
                 <div className="w-full sm:w-32 h-32 rounded-lg bg-gradient-to-br from-deep-dark to-black border border-neon-cyan/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  {item.image && (item.image.startsWith('data:') || item.image.startsWith('http')) ? (
+                  {item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('/')) ? (
                     <img
                       src={item.image}
                       alt={item.name}

@@ -144,7 +144,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                         const isValidIndex = imageIndex >= 0 && imageIndex < (product.images?.length || 0)
                         const imageUrl = hasImages && isValidIndex ? product.images[imageIndex] : null
                         
-                        return imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http')) ? (
+                        return imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http') || imageUrl.startsWith('/')) ? (
                           <img
                             src={imageUrl}
                             alt={product.name}
@@ -202,7 +202,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                                 : 'border-neon-cyan/20'
                             }`}
                           >
-                            {image && (image.startsWith('data:') || image.startsWith('http')) ? (
+                            {image && (image.startsWith('data:') || image.startsWith('http') || image.startsWith('/')) ? (
                               <img
                                 src={image}
                                 alt={`${product.name} ${index + 1}`}

@@ -304,8 +304,8 @@ const initialPromotions: Promotion[] = [
 ]
 
 const initialFooterContent: FooterContent = {
-  logoText: 'CAPSULE',
-  description: 'Инновационные капсульные дома с технологичным дизайном. Быстрая сборка, высокое качество, уникальные решения для современной жизни.',
+  logoText: 'Modus Tech',
+  description: 'Modus Tech — производитель ярких капсульных домов. Быстрая сборка, умные опции и комфорт в любой локации.',
   contacts: {
     phone: '+7 (999) 123-45-67',
     email: 'info@capsulehouses.ru',
@@ -343,9 +343,9 @@ const initialAdvantages: Advantage[] = [
 ]
 
 const initialHeroContent: HeroContent = {
-  title: 'Капсульные дома будущего уже здесь',
-  subtitle: 'Инновационные решения для комфортной жизни. Быстрая сборка, экологичные материалы, умные технологии. Создайте свой идеальный дом за считанные дни.',
-  ctaText: 'В каталог',
+  title: 'Яркие капсульные дома Modus Tech',
+  subtitle: 'Современные модули с панорамным остеклением, умной начинкой и дизайнерской подсветкой. Установим и запустим за считанные дни.',
+  ctaText: 'Смотреть каталог',
 }
 
 const initialPageCustomData: PageCustomData = {

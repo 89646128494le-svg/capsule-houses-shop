@@ -24,24 +24,24 @@ const initialCatalogs: Catalog[] = [
     id: 1,
     title: 'Каталог капсульных домов 2024',
     description: 'Полный каталог наших капсульных домов с техническими характеристиками',
-    coverImage: '',
-    pdfUrl: '',
+    coverImage: '/bright-1.jpg',
+    pdfUrl: '/catalogs/catalog.pdf',
     pdfFileName: 'catalog-2024.pdf',
   },
   {
     id: 2,
     title: 'Премиум серия',
     description: 'Эксклюзивные модели премиум класса',
-    coverImage: '',
-    pdfUrl: '',
+    coverImage: '/bright-2.jpg',
+    pdfUrl: '/catalogs/catalog.pdf',
     pdfFileName: 'premium-series.pdf',
   },
   {
     id: 3,
     title: 'Модульные комплексы',
     description: 'Решения для создания модульных комплексов',
-    coverImage: '',
-    pdfUrl: '',
+    coverImage: '/hero-bg.jpg',
+    pdfUrl: '/catalogs/catalog.pdf',
     pdfFileName: 'modular-complexes.pdf',
   },
 ]
@@ -80,7 +80,7 @@ export const useCatalogsStore = create<CatalogsStore>()(
       },
     }),
     {
-      name: 'capsule-catalogs-storage',
+      name: 'capsule-catalogs-storage-v2',
       storage: createJSONStorage(() => localStorage),
     }
   )
